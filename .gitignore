@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# PyCharm / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Benchmark runtime checkpoints & local db
+results/checkpoint.jsonl
+results/logs/*.html
+results/figures/*.png
+results/figures/*.svg
+results/badanie_groupchat_wyniki.xlsx
+local_database.txt
+
+# OS generated
+.DS_Store
+Thumbs.db
