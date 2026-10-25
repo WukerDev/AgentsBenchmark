@@ -38,7 +38,6 @@ class BenchmarkRunner:
         self.dry_run = dry_run
         self.no_live = no_live
 
-        # Paths
         self.checkpoint_path = BASE_DIR / config.system.checkpoint_file
         self.excel_path = BASE_DIR / config.system.excel_output
         self.reports_dir = RESULTS_DIR / "reports"
@@ -76,7 +75,6 @@ class BenchmarkRunner:
 
         live_ui = BenchmarkLiveConsole(total_tasks=total_tasks_count)
 
-        # Pre-fill completed rows in live console
         for tid, row in completed_records.items():
             live_ui.add_completed_row(
                 tid,
@@ -94,7 +92,6 @@ class BenchmarkRunner:
         multi_runner = MultiAgentSwarmRunner(provider=self.provider)
         jury = LLMJury(provider=self.provider)
 
-        # Execution loop
         with Live(live_ui.get_renderable(), refresh_per_second=4, console=console) as live:
             for idx, task in enumerate(self.tasks):
                 task_id = task["id"]
@@ -107,23 +104,19 @@ class BenchmarkRunner:
                 live.update(live_ui.get_renderable())
 
                 if self.dry_run:
-                    # Mock dry-run execution
                     time.sleep(0.3)
                     solo_res = {"final_answer": "Dry run mock answer", "generation_time": 0.1, "tool_time": 0.0, "total_time": 0.1, "tokens": 100, "cost": 0.0001, "turns": 1, "chat_history": "Mock history"}
                     group_res = {"final_answer": "Dry run mock answer", "snapshot_5": "Mock 5", "snapshot_10": "Mock 10", "generation_time": 0.2, "tool_time": 0.0, "total_time": 0.2, "tokens": 300, "cost": 0.0003, "turns": 3, "agent_path": "analyst -> solver -> secretary", "chat_history": "Mock swarm history"}
                     scores = {"score_solo": 80.0, "score_multi_5": 70.0, "score_multi_10": 85.0, "score_multi_final": 95.0, "hallucination_solo": False, "hallucination_multi": False, "jury_reasons": "[Mock Jury]: Poprawne", "judge_total_cost": 0.0001}
                 else:
-                    # 1. Solo ReAct execution
                     live_ui.set_step(f"Zadanie [{idx+1}/{total_tasks_count}]: Uruchamiam Solo ReAct...")
                     live.update(live_ui.get_renderable())
                     solo_res = solo_runner.run(task["query"])
 
-                    # 2. Multi-Agent Swarm execution
                     live_ui.set_step(f"Zadanie [{idx+1}/{total_tasks_count}]: Uruchamiam Multi-Agent Swarm...")
                     live.update(live_ui.get_renderable())
                     group_res = multi_runner.run(task["query"])
 
-                    # 3. Ground Truth & Jury Evaluation
                     live_ui.set_step(f"Zadanie [{idx+1}/{total_tasks_count}]: Ewaluacja Sędziowska...")
                     live.update(live_ui.get_renderable())
                     jury_eval = jury.evaluate(
@@ -145,13 +138,11 @@ class BenchmarkRunner:
                         "judge_total_cost": jury_eval.judge_total_cost
                     }
 
-                # Ground Truth Verification
                 gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(task_id, solo_res["final_answer"])
                 gt_multi_score, gt_multi_ok, gt_multi_expl = GroundTruthVerifier.verify(task_id, group_res["final_answer"])
 
                 multi_total_cost = group_res["cost"] + scores.get("judge_total_cost", 0.0)
 
-                # Prepare result record
                 row_record = {
                     "task_id": task_id,
                     "category": category,
@@ -179,7 +170,6 @@ class BenchmarkRunner:
                     "jury_reason": scores.get("jury_reasons", "")
                 }
 
-                # Save checkpoint and update live display
                 self.checkpoint_mgr.save_task_result(row_record)
                 all_results.append(row_record)
 
@@ -194,7 +184,6 @@ class BenchmarkRunner:
                 )
                 live.update(live_ui.get_renderable())
 
-                # Generate detailed per-task HTML log
                 HTMLReporter.generate_task_log(
                     self.logs_dir / f"log_{timestamp}_{task_id}.html",
                     task_id,
@@ -207,19 +196,15 @@ class BenchmarkRunner:
 
         console.print(live_ui.results_table)
 
-        # Generate aggregated stats, Excel, LaTeX, and Plots
         df_final = pd.DataFrame(all_results)
         stats = compute_benchmark_statistics(df_final)
 
-        # 1. Excel export
         ExcelBenchmarkExporter.export(self.excel_path, df_final, stats)
         console.print(f"[bold green][OK] Zapisano arkusz Excel:[/bold green] [underline]{self.excel_path}[/underline]")
 
-        # 2. LaTeX tables export
         LatexExporter.export(self.reports_dir, df_final, stats)
         console.print(f"[bold green][OK] Wygenerowano tabele LaTeX w:[/bold green] [underline]{self.reports_dir}[/underline]")
 
-        # 3. Plots export
         BenchmarkVisualizer.generate_all_plots(df_final, self.figures_dir, show=False)
         console.print(f"[bold green][OK] Wygenerowano wykresy badawcze w:[/bold green] [underline]{self.figures_dir}[/underline]")
 

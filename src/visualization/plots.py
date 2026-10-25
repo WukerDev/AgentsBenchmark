@@ -6,7 +6,6 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-# Set publication style
 plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
 plt.rcParams.update({
     "font.family": "sans-serif",
@@ -37,7 +36,6 @@ class BenchmarkVisualizer:
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
         fig.suptitle("Podsumowanie Badania: Solo Agent (ReAct) vs Multi-Agent Swarm", fontsize=15)
 
-        # 1. Scores Comparison
         solo_mean = df["score_solo"].mean()
         multi_mean = df["score_multi_final"].mean()
         ax = axes[0, 0]
@@ -48,7 +46,6 @@ class BenchmarkVisualizer:
             h = b.get_height()
             ax.text(b.get_x() + b.get_width()/2., h + 2, f"{h:.1f}", ha="center", va="bottom", fontweight="bold")
 
-        # 2. Time Breakdown: LLM Generation vs Tools
         ax2 = axes[0, 1]
         solo_gen = df["solo_generation_time"].mean() if "solo_generation_time" in df else 0
         multi_gen = df["multi_generation_time"].mean() if "multi_generation_time" in df else 0
@@ -61,7 +58,6 @@ class BenchmarkVisualizer:
         ax2.set_ylabel("Sekundy (s)")
         ax2.legend()
 
-        # 3. Cost per Task (USD)
         ax3 = axes[1, 0]
         solo_cost = df["solo_cost_usd"].mean() if "solo_cost_usd" in df else 0
         multi_cost = df["multi_cost_usd"].mean() if "multi_cost_usd" in df else 0
@@ -72,7 +68,6 @@ class BenchmarkVisualizer:
             h = b.get_height()
             ax3.text(b.get_x() + b.get_width()/2., h + 0.0001, f"${h:.4f}", ha="center", va="bottom", fontweight="bold")
 
-        # 4. Token Efficiency (Score per 1k tokens)
         ax4 = axes[1, 1]
         solo_tok = df["solo_tokens"].mean()
         multi_tok = df["multi_tokens"].mean()

@@ -56,7 +56,6 @@ class SoloAgentRunner:
             total_cost += res.cost
             response_text = res.text
 
-            # Execute any tools called
             tool_output, tool_time, tool_results = process_tools_in_response(response_text)
             total_tool_time += tool_time
 

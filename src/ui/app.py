@@ -22,7 +22,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom styling
 st.markdown("""
 <style>
     .main-header { font-size: 2.2rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0.5rem; }
@@ -33,7 +32,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load tasks
 tasks_path = CONFIG_DIR / "tasks.json"
 if not tasks_path.exists():
     tasks_path = BASE_DIR / "tasks.json"
@@ -41,7 +39,6 @@ if not tasks_path.exists():
 with open(tasks_path, "r", encoding="utf-8") as f:
     ALL_TASKS = json.load(f)
 
-# Sidebar
 st.sidebar.title("⚙️ Konfiguracja Badania")
 provider = st.sidebar.selectbox(
     "Dostawca Modeli (Provider):",
@@ -66,7 +63,6 @@ task_ids = [t["id"] for t in filtered_tasks]
 selected_task_id = st.sidebar.selectbox("Wybierz zadanie:", task_ids)
 current_task = next(t for t in filtered_tasks if t["id"] == selected_task_id)
 
-# Main Screen
 st.markdown('<div class="main-header">AiAgents Task Solving Benchmark</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Platforma badawcza: Solo ReAct vs Multi-Agent Swarm (Projekt Inżynierski)</div>', unsafe_allow_html=True)
 
@@ -83,7 +79,6 @@ with tab_test:
     if st.button("🚀 Uruchom Test Porównawczy dla tego Zadania", type="primary", use_container_width=True):
         col_solo, col_multi = st.columns(2)
 
-        # 1. Run Solo Agent
         with col_solo:
             st.markdown("### 👤 Solo Agent (ReAct)")
             solo_status = st.empty()
@@ -99,7 +94,6 @@ with tab_test:
             st.markdown("**Odpowiedź Solo:**")
             st.text_area("", value=solo_res["final_answer"], height=160, key="solo_ans_box", disabled=True)
 
-        # 2. Run Multi-Agent Swarm
         with col_multi:
             st.markdown("### 🐝 Multi-Agent Swarm")
             multi_status = st.empty()
@@ -120,7 +114,6 @@ with tab_test:
         st.markdown("---")
         st.subheader("⚖️ Werdykt Sędziowski & Weryfikacja")
 
-        # Ground truth deterministic check
         gt_score, gt_ok, gt_expl = GroundTruthVerifier.verify(current_task["id"], group_res["final_answer"])
         gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(current_task["id"], solo_res["final_answer"])
 
@@ -132,7 +125,6 @@ with tab_test:
             st.metric("Multi Ground Truth", f"{gt_score}/100", delta="Poprawny" if gt_ok else "Niepoprawny")
             st.caption(gt_expl)
 
-        # Jury check
         jury = LLMJury(provider=provider)
         jury_res = jury.evaluate(
             current_task["query"],
@@ -172,7 +164,6 @@ with tab_results:
             col_s3.metric("Multi Win Rate", f"{stats.get('multi_win_rate', 0)}%")
             col_s4.metric("Wilcoxon p-value", f"{stats.get('wilcoxon_pvalue', 'N/A')}")
 
-            # Plot figures
             st.markdown("---")
             st.subheader("Wykresy do Pracy Inżynierskiej")
             fig_dir = BASE_DIR / "results" / "figures"

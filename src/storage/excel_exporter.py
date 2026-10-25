@@ -6,18 +6,13 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 class ExcelBenchmarkExporter:
-    """
-    Exports comprehensive multi-tab formatted Excel reports for research analysis.
-    """
     @classmethod
     def export(cls, output_path: Path, df_results: pd.DataFrame, stats: Dict[str, Any]):
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            # Sheet 1: Main Task Results
             df_results.to_excel(writer, sheet_name="Wyniki_Zadan", index=False)
 
-            # Sheet 2: Category Breakdown
             if "category" in df_results:
                 cat_summary = df_results.groupby("category").agg(
                     Liczba_Zadan=("task_id", "count"),
@@ -30,7 +25,6 @@ class ExcelBenchmarkExporter:
                 ).round(2).reset_index()
                 cat_summary.to_excel(writer, sheet_name="Podsumowanie_Kategorii", index=False)
 
-            # Sheet 3: Turn Evolution
             if "score_multi_5" in df_results and "score_multi_10" in df_results:
                 evo_df = df_results[["task_id", "score_solo", "score_multi_5", "score_multi_10", "score_multi_final"]].copy()
                 evo_df.rename(columns={
@@ -41,7 +35,6 @@ class ExcelBenchmarkExporter:
                 }, inplace=True)
                 evo_df.to_excel(writer, sheet_name="Ewolucja_Tur", index=False)
 
-            # Sheet 4: Hypothesis Testing & Global Stats
             if stats:
                 stat_rows = [
                     {"Metryka": "Liczba zbadanych zadań", "Wartość": stats.get("n_tasks")},
@@ -63,7 +56,6 @@ class ExcelBenchmarkExporter:
                 ]
                 pd.DataFrame(stat_rows).to_excel(writer, sheet_name="Statystyka_Naukowa", index=False)
 
-            # Format Workbook Styles
             wb = writer.book
             header_fill = PatternFill(start_color="1F497D", end_color="1F497D", fill_type="solid")
             header_font = Font(color="FFFFFF", bold=True, name="Segoe UI")

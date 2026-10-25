@@ -5,12 +5,7 @@ import time
 from typing import Tuple
 
 def execute_python_code(code: str, timeout: int = 15) -> Tuple[str, float]:
-    """
-    Executes Python code in an isolated subprocess within the active virtual environment.
-    Captures stdout, stderr, and handles timeouts gracefully.
-    """
     start_t = time.time()
-    # Normalize code
     code = code.strip()
 
     try:

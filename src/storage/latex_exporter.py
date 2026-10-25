@@ -4,9 +4,6 @@ from typing import Dict, Any
 import pandas as pd
 
 class LatexExporter:
-    """
-    Generates publication-ready LaTeX tables for the engineering thesis document.
-    """
     @classmethod
     def export(cls, output_dir: Path, df: pd.DataFrame, stats: Dict[str, Any]):
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -14,7 +11,6 @@ class LatexExporter:
         if df.empty:
             return
 
-        # 1. Main Results Table
         table_rows = []
         for _, r in df.iterrows():
             tid = str(r.get("task_id", "")).replace("_", "\\_")
@@ -23,7 +19,6 @@ class LatexExporter:
             t_solo = f"{r.get('solo_time', 0):.1f}s"
             t_multi = f"{r.get('multi_time', 0):.1f}s"
 
-            # Bold the winner
             if float(r.get("score_multi_final", 0)) > float(r.get("score_solo", 0)):
                 s_multi = f"\\textbf{{{s_multi}}}"
             elif float(r.get("score_solo", 0)) > float(r.get("score_multi_final", 0)):
@@ -31,8 +26,7 @@ class LatexExporter:
 
             table_rows.append(f"{tid} & {s_solo} & {s_multi} & {t_solo} & {t_multi} \\\\")
 
-        main_latex = f"""% Tabela wygenerowana automatycznie przez AiAgentsTaskSolvingBenchmark
-\\begin{{table}}[htbp]
+        main_latex = f"""\\begin{{table}}[htbp]
 \\centering
 \\caption{{Porównanie skuteczności Solo ReAct vs Multi-Agent Swarm}}
 \\label{{tab:benchmark_wyniki}}
@@ -50,7 +44,6 @@ class LatexExporter:
         with open(output_dir / "tabela_wynikow.tex", "w", encoding="utf-8") as f:
             f.write(main_latex)
 
-        # 2. Category Breakdown Table
         if "category" in df:
             cat_df = df.groupby("category").agg(
                 Liczba=("task_id", "count"),
@@ -65,8 +58,7 @@ class LatexExporter:
                 cname = str(cr["category"]).replace("_", " ").title()
                 cat_rows.append(f"{cname} & {int(cr['Liczba'])} & {cr['Solo']:.1f} & {cr['Multi']:.1f} & {cr['SoloTime']:.1f}s & {cr['MultiTime']:.1f}s \\\\")
 
-            cat_latex = f"""% Podsumowanie kategorii wygenerowane automatycznie
-\\begin{{table}}[htbp]
+            cat_latex = f"""\\begin{{table}}[htbp]
 \\centering
 \\caption{{Wyniki badania z podziałem na kategorie zadań}}
 \\label{{tab:kategorie_wyniki}}
@@ -82,9 +74,7 @@ class LatexExporter:
             with open(output_dir / "tabela_kategorii.tex", "w", encoding="utf-8") as f:
                 f.write(cat_latex)
 
-        # 3. Statistical Significance Table
-        stat_latex = f"""% Testy hipotez statystycznych
-\\begin{{table}}[htbp]
+        stat_latex = f"""\\begin{{table}}[htbp]
 \\centering
 \\caption{{Weryfikacja istotności statystycznej (Solo vs Multi-Agent)}}
 \\label{{tab:statystyka_istotnosci}}

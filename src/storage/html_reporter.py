@@ -4,10 +4,6 @@ from typing import Dict, Any, List
 import json
 
 class HTMLReporter:
-    """
-    Generates modern, interactive HTML reports for benchmark tasks and overall research run.
-    """
-
     @classmethod
     def generate_task_log(
         cls,
@@ -24,7 +20,6 @@ class HTMLReporter:
         solo_history_html = solo_res.get("chat_history", "").replace("\n", "<br>")
         multi_history = group_res.get("chat_history", "")
 
-        # Format multi-agent history into nice speech cards
         cards_html = ""
         parts = multi_history.split("---")
         for part in parts:
@@ -35,17 +30,16 @@ class HTMLReporter:
             role_header = lines[0].strip()
             msg_content = lines[1].strip() if len(lines) > 1 else ""
 
-            # Assign colors
             badge_color = "bg-blue-100 text-blue-800"
-            if "Orchestrator" in role_header or "Kierownik" in role_header:
+            if "Orchestrator" in role_header or "Kierownik" in role_header or "Discussion" in role_header:
                 badge_color = "bg-purple-100 text-purple-800"
-            elif "Coder" in role_header or "Programista" in role_header:
+            elif "Coder" in role_header or "Programista" in role_header or "Developer" in role_header:
                 badge_color = "bg-cyan-100 text-cyan-800"
-            elif "Adwokat" in role_header or "devil" in role_header:
+            elif "Adwokat" in role_header or "devil" in role_header.lower():
                 badge_color = "bg-red-100 text-red-800"
-            elif "Krytyk" in role_header or "critic" in role_header:
+            elif "Krytyk" in role_header or "critic" in role_header.lower() or "Reviewer" in role_header:
                 badge_color = "bg-yellow-100 text-yellow-800"
-            elif "Sekretarz" in role_header:
+            elif "Sekretarz" in role_header or "Secretary" in role_header:
                 badge_color = "bg-green-100 text-green-800"
 
             cards_html += f"""
@@ -69,7 +63,6 @@ class HTMLReporter:
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
     <div class="max-w-6xl mx-auto">
-        <!-- Header -->
         <div class="mb-8">
             <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
             <h1 class="text-3xl font-bold mt-2 text-gray-900">{task_id}</h1>
@@ -83,7 +76,6 @@ class HTMLReporter:
             </div>
         </div>
 
-        <!-- Scores bar -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
                 <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
@@ -105,15 +97,12 @@ class HTMLReporter:
             </div>
         </div>
 
-        <!-- Jury Reason -->
         <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
             <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
             <div class="text-sm text-yellow-950 mt-1">{scores.get('reason', scores.get('jury_reasons', 'Brak'))}</div>
         </div>
 
-        <!-- History Split View -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Solo Model -->
             <div>
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                     <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
@@ -124,7 +113,6 @@ class HTMLReporter:
                 </div>
             </div>
 
-            <!-- Multi Agent -->
             <div>
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                     <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>

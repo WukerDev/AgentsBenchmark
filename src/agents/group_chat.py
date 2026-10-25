@@ -28,7 +28,6 @@ class MultiAgentSwarmRunner:
         self.model_override = model_override
         self.client = UnifiedLLMClient(provider=self.provider)
 
-        # Build agent map
         self.agents_map: Dict[str, AgentConfig] = {}
         for a in self.agents_config:
             if self.model_override:
@@ -43,7 +42,6 @@ class MultiAgentSwarmRunner:
         task: str,
         last_speaker_id: str
     ) -> Tuple[str, LLMResponse]:
-        # Guardrails
         if last_speaker_id == "secretary":
             return "finish", LLMResponse(text="finish", tokens=0, generation_time=0.0, cost=0.0, model="", provider=self.provider)
 
@@ -52,7 +50,7 @@ class MultiAgentSwarmRunner:
             if "ZATWIERDZAM" in last_msg:
                 return "secretary", LLMResponse(text="secretary", tokens=0, generation_time=0.0, cost=0.0, model="", provider=self.provider)
 
-        devil_count = history.count("Adwokat Diabła")
+        devil_count = history.count("Adwokat Diabła") + history.count("Devil's Advocate")
         if last_speaker_id == "solver" and devil_count >= 2:
             return "critic", LLMResponse(text="critic", tokens=0, generation_time=0.0, cost=0.0, model="", provider=self.provider)
 
@@ -101,7 +99,6 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
             chosen = "finish"
 
         if not chosen:
-            # Deterministic fallback state machine
             fallback_map = {
                 "none": "analyst",
                 "analyst": "solver",
@@ -155,7 +152,6 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
             if not cur_agent_cfg:
                 break
 
-            # Format history window
             history_parts = chat_history.split("---")
             recent_history = "---".join(history_parts[-5:]) if len(history_parts) > 5 else chat_history
 
@@ -178,7 +174,6 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
             total_cost += agent_res.cost
             response_text = agent_res.text
 
-            # Execute tools
             tool_output, tool_time, tool_results = process_tools_in_response(response_text)
             total_tool_time += tool_time
 

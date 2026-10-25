@@ -6,7 +6,6 @@ import yaml
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-# Automatically load .env if present
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,7 +14,7 @@ RESULTS_DIR = BASE_DIR / "results"
 
 class SystemSettings(BaseModel):
     seed: int = 2026
-    default_provider: str = "ollama"  # ollama, groq, openai, openrouter
+    default_provider: str = "ollama"
     checkpoint_file: str = "results/checkpoint.jsonl"
     excel_output: str = "results/badanie_groupchat_wyniki.xlsx"
     local_db_file: str = "local_database.txt"
@@ -78,7 +77,6 @@ class AppConfig(BaseModel):
             with open(path, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
 
-        # Allow .env to override default_provider
         env_provider = os.getenv("DEFAULT_PROVIDER")
         if env_provider and "system" in data:
             data["system"]["default_provider"] = env_provider
@@ -103,5 +101,4 @@ class AppConfig(BaseModel):
         rate = self.pricing_per_1m_tokens.get(model, self.pricing_per_1m_tokens.get("default", 1.0))
         return (total_tokens / 1_000_000.0) * rate
 
-# Global singleton config
 config = AppConfig.load()

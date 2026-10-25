@@ -1,6 +1,6 @@
 system:
   seed: 2026
-  default_provider: "ollama"   # Options: 'ollama', 'groq', 'openai', 'openrouter'
+  default_provider: "ollama"
   checkpoint_file: "results/checkpoint.jsonl"
   excel_output: "results/badanie_groupchat_wyniki.xlsx"
   local_db_file: "local_database.txt"
@@ -26,14 +26,12 @@ providers:
     api_key_env: "OPENROUTER_API_KEY"
 
 models:
-  # Default Solo Agent model per provider
   solo_model:
     ollama: "qwen2.5:14b"
     groq: "llama-3.3-70b-versatile"
     openai: "gpt-4o-mini"
     openrouter: "meta-llama/llama-3.3-70b-instruct"
 
-  # Default Jury models per provider
   jury_models:
     ollama:
       - "phi4"

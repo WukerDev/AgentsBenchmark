@@ -18,10 +18,6 @@ class LLMResponse:
     provider: str
 
 class UnifiedLLMClient:
-    """
-    Unified client for LLM inference supporting Ollama (local), Groq, OpenAI, OpenRouter.
-    Uses OpenAI-compatible protocol with custom headers and streaming.
-    """
     def __init__(self, provider: Optional[str] = None):
         self.provider = provider or config.system.default_provider
         self.client = self._init_client()
@@ -29,8 +25,6 @@ class UnifiedLLMClient:
     def _init_client(self) -> OpenAI:
         base_url = config.get_base_url(self.provider)
         api_key = config.get_api_key(self.provider) or "dummy-key-for-local"
-
-        # 60s timeout for complex local inference
         http_client = httpx.Client(timeout=httpx.Timeout(120.0, connect=10.0))
         return OpenAI(base_url=base_url, api_key=api_key, http_client=http_client)
 
@@ -45,9 +39,6 @@ class UnifiedLLMClient:
         stream_callback: Optional[Callable[[str], None]] = None,
         max_retries: int = 3
     ) -> LLMResponse:
-        """
-        Generate completion using the configured provider and model.
-        """
         target_model = model or config.models.solo_model.get(self.provider, "qwen2.5:14b")
         messages = []
         if system_prompt:
@@ -55,7 +46,6 @@ class UnifiedLLMClient:
         messages.append({"role": "user", "content": prompt})
 
         extra_body: Dict[str, Any] = {}
-        # If Ollama, we can optionally pass keep_alive or seed
         if self.provider == "ollama":
             keep_alive = getattr(config.providers.ollama, "keep_alive", "5m")
             extra_body["keep_alive"] = keep_alive
@@ -126,7 +116,6 @@ class UnifiedLLMClient:
                 last_error = e
                 time.sleep(2 ** attempt)
 
-        # Fallback on complete failure
         return LLMResponse(
             text=f"ERROR: {last_error}",
             tokens=0,

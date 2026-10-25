@@ -14,15 +14,10 @@ class ToolResult:
         self.time_spent = time_spent
 
 def process_tools_in_response(response_text: str) -> Tuple[str, float, List[ToolResult]]:
-    """
-    Scans the response text for tool invocation patterns, executes them,
-    and returns (appended_system_output, total_time_spent, list_of_tool_results).
-    """
     total_time = 0.0
     combined_output = ""
     results: List[ToolResult] = []
 
-    # 1. Python Code Blocks: ```python ... ```
     code_matches = re.findall(r"```python(.*?)```", response_text, re.DOTALL)
     for code in code_matches:
         code_str = code.strip()
@@ -32,7 +27,6 @@ def process_tools_in_response(response_text: str) -> Tuple[str, float, List[Tool
             results.append(ToolResult("python", code_str, out, t))
             combined_output += f"\n[SYSTEM: Wynik wykonania kodu Python]:\n{out}\n"
 
-    # 2. Web Search: SEARCH: <query>
     search_matches = re.findall(r"^SEARCH:\s*(.+)$", response_text, re.MULTILINE)
     for q in search_matches:
         q_str = q.strip()
@@ -42,7 +36,6 @@ def process_tools_in_response(response_text: str) -> Tuple[str, float, List[Tool
             results.append(ToolResult("web_search", q_str, out, t))
             combined_output += f"\n[SYSTEM: Wyniki wyszukiwania w sieci dla '{q_str}']:\n{out}\n"
 
-    # 3. Local Docs: LOCAL_DOC: <query>
     doc_matches = re.findall(r"^LOCAL_DOC:\s*(.+)$", response_text, re.MULTILINE)
     for q in doc_matches:
         q_str = q.strip()

@@ -5,10 +5,6 @@ import numpy as np
 from scipy import stats
 
 def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
-    """
-    Computes statistical metrics comparing Solo ReAct vs Multi-Agent Swarm,
-    including hypothesis testing (Wilcoxon signed-rank and paired t-test).
-    """
     if df.empty or "score_solo" not in df or "score_multi_final" not in df:
         return {}
 
@@ -26,7 +22,6 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         "score_delta": round(float(np.mean(multi_scores) - np.mean(solo_scores)), 2)
     }
 
-    # Hypothesis testing (Wilcoxon and Paired t-test)
     if len(solo_scores) >= 5 and np.any(solo_scores != multi_scores):
         try:
             t_stat, t_pval = stats.ttest_rel(multi_scores, solo_scores)
@@ -44,7 +39,6 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         except Exception:
             stats_dict["wilcoxon_pvalue"] = None
 
-    # Win / Tie / Loss counts
     wins = int(np.sum(multi_scores > solo_scores))
     ties = int(np.sum(multi_scores == solo_scores))
     losses = int(np.sum(multi_scores < solo_scores))
@@ -53,7 +47,6 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
     stats_dict["multi_losses"] = losses
     stats_dict["multi_win_rate"] = round(wins / len(solo_scores) * 100, 1)
 
-    # Category analysis if category column is present
     if "category" in df:
         cat_stats = df.groupby("category").agg(
             solo_avg=("score_solo", "mean"),
@@ -62,7 +55,6 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         ).round(2).to_dict(orient="index")
         stats_dict["category_breakdown"] = cat_stats
 
-    # Progression across snapshots
     if "score_multi_5" in df and "score_multi_10" in df:
         stats_dict["evolution"] = {
             "turn_5_mean": round(float(df["score_multi_5"].mean()), 2),
