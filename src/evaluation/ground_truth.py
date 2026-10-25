@@ -17,27 +17,37 @@ class GroundTruthVerifier:
 
         # Task 1: Helium balloon in accelerating car
         if task_id == "task_01_helium":
-            if "przodu" in ans or "do przodu" in ans:
-                return 100, True, "Prawidłowo wskazano wychylenie balonu do przodu."
-            return 0, False, "Brak poprawnego kierunku (do przodu)."
+            if "przodu" in ans or "do przodu" in ans or "forward" in ans:
+                return 100, True, "Prawidłowo: balon wychyla się do przodu (forward)."
+            return 0, False, "Brak poprawnego kierunku (do przodu / forward)."
 
         # Task 2: Monty Hall 100 doors
         if task_id == "task_02_monty_hall_100":
             has_99 = "99" in ans or "0.99" in ans
-            has_change = "zmienić" in ans or "opłaca" in ans or "tak" in ans
+            has_change = "zmienić" in ans or "opłaca" in ans or "tak" in ans or "yes" in ans or "change" in ans
             if has_99 and has_change:
                 return 100, True, "Prawidłowo: opłaca się zmienić (szansa 99%)."
             elif has_99 or has_change:
                 return 50, False, "Częściowo poprawna odpowiedź."
             return 0, False, "Błędne prawdopodobieństwo."
 
-        # Task 3: Self reference word length
+        # Task 3: Fibonacci sum (EN) / Self reference (PL)
+        if task_id == "task_03_fibonacci_sum":
+            if "9772042" in ans:
+                return 100, True, "Prawidłowa połowa sumy liczb Fibonacciego: 9772042."
+            return 0, False, "Błędna suma (oczekiwano 9772042)."
         if task_id == "task_03_self_reference":
             if "jedenaście" in ans or "11" in ans:
                 return 100, True, "Prawidłowa liczba liter: jedenaście (11)."
             return 0, False, "Błędna liczba liter."
 
-        # Task 4: LCM problem
+        # Task 4: Collatz conjecture (EN) / LCM problem (PL)
+        if task_id == "task_04_collatz_conjecture":
+            has_35655 = "35655" in ans
+            has_324 = "324" in ans
+            if has_35655 and has_324:
+                return 100, True, "Prawidłowa liczba startowa (35655) oraz długość ciągu Collatza (324)."
+            return 50 if (has_35655 or has_324) else 0, False, "Częściowy lub brak wyniku."
         if task_id == "task_04_lcm_problem":
             if "2519" in ans:
                 return 100, True, "Prawidłowy wynik NWW-1: 2519."
@@ -51,8 +61,8 @@ class GroundTruthVerifier:
 
         # Task 6: Relativity running on equator
         if task_id == "task_06_relativity":
-            if "cięższy" in ans or "wzrośnie" in ans or "większ" in ans:
-                return 100, True, "Prawidłowo: waga wzrośnie (staniesz się cięższy)."
+            if any(k in ans for k in ["cięższy", "wzrośnie", "większ", "heavier", "increase"]):
+                return 100, True, "Prawidłowo: waga wzrośnie / staniesz się cięższy."
             return 0, False, "Błędna konkluzja fizyczna."
 
         # Task 7: Palindrome hardcoded exception
@@ -60,26 +70,25 @@ class GroundTruthVerifier:
             has_ala = "ala" in ans
             has_zakaz = "zakaz" in ans
             has_potop = "potop" in ans
-            no_kajak = "kajak" not in ans or "wyjątek" in ans or "nie zawiera kajak" in ans
-            if has_ala and has_zakaz and has_potop and ("kajak" not in ans or "'kajak'" not in ans):
+            if has_ala and has_zakaz and has_potop and ("'kajak'" not in ans or "not 'kajak'" in ans or "wyjątek" in ans):
                 return 100, True, "Prawidłowo: lista zawiera ala, zakaz, potop i wyklucza kajak."
             return 25, False, "Nieprawidłowe uwzględnienie wyjątku."
 
         # Task 8: Boy born on Tuesday
         if task_id == "task_08_probability_boy":
-            if "13/27" in ans or "48.1" in ans or "0.481" in ans or "48%" in ans:
+            if any(k in ans for k in ["13/27", "48.1", "0.481", "48%"]):
                 return 100, True, "Prawidłowe prawdopodobieństwo paradoksu: 13/27 (~48.1%)."
             return 0, False, "Błędne prawdopodobieństwo."
 
         # Task 9: Logic grid (Adam, Bogdan, Cezary)
         if task_id == "task_09_logic_grid":
-            if "tester" in ans or "testerem" in ans:
+            if "tester" in ans or "testerem" in ans or "qa" in ans:
                 return 100, True, "Prawidłowo: Adam jest testerem."
             return 0, False, "Błędne przypisanie roli Adamowi."
 
         # Task 10: Dirt in hole
         if task_id == "task_10_trick_math":
-            if "zero" in ans or "0" in ans or "brak" in ans or "pust" in ans:
+            if any(k in ans for k in ["zero", "0", "brak", "pust", "none", "empty"]):
                 return 100, True, "Prawidłowo: w dziurze nie ma ziemi (0 m3)."
             return 0, False, "Model policzył objętość zamiast zauważyć podchwytliwość."
 
@@ -132,7 +141,7 @@ class GroundTruthVerifier:
         # Task 17: Cron logic
         if task_id == "task_17_cron_logic":
             has_czw = "czwartek" in ans or "thursday" in ans
-            has_8 = "8:00" in ans or "08:00" in ans
+            has_8 = "8:00" in ans or "08:00" in ans or "8 am" in ans
             if has_czw and has_8:
                 return 100, True, "Prawidłowy termin wykonania CRON: czwartek 8:00."
             return 0, False, "Błędna interpretacja limitów godzinowych CRON."
@@ -161,7 +170,7 @@ class GroundTruthVerifier:
 
         # Task 21: Compound interest + Belka tax
         if task_id == "task_21_complex_compound_interest":
-            if "12513.56" in ans or "12513,56" in ans or "12513" in ans:
+            if any(k in ans for k in ["12513.56", "12513,56", "12513"]):
                 return 100, True, "Prawidłowa kwota z podatkiem Belki: 12513.56 PLN."
             return 0, False, "Błędna symulacja odsetek."
 
@@ -173,41 +182,53 @@ class GroundTruthVerifier:
                 return 100, True, "Prawidłowa walidacja oktetów 0-255."
             return 25, False, "Regex przepuścił nieprawidłowy adres lub pominął poprawne."
 
-        # Task 23: Live system hash
+        # Task 23: Anagram groups (EN) / Live system hash (PL)
+        if task_id == "task_23_anagram_groups":
+            if "2" in ans:
+                return 100, True, "Prawidłowa liczba grup anagramów o 3 słowach: 2."
+            return 0, False, "Błędna liczba grup (oczekiwano 2)."
         if task_id == "task_23_live_system_hash":
             today = datetime.now().strftime("%Y-%m-%d")
             expected_hash = hashlib.sha256(today.encode("utf-8")).hexdigest().lower()
             if expected_hash in ans.lower():
                 return 100, True, f"Prawidłowy dynamiczny hash SHA-256 dla daty {today}."
-            # Check if at least format is valid SHA-256
-            if re.search(r"\b[a-f0-9]{64}\b", ans.lower()):
-                return 50, False, "Zwrócono format SHA-256, ale niezgodny z dzisiejszą datą."
             return 0, False, "Brak poprawnego hasha SHA-256."
 
         # Task 24: Noise data sanitization
         if task_id == "task_24_noise_data_sanitization":
             has_32 = "32" in ans
-            has_false = "false" in ans or "nie jest podzieln" in ans or "fałsz" in ans
+            has_false = any(k in ans for k in ["false", "nie jest podzieln", "fałsz"])
             if has_32 and has_false:
                 return 100, True, "Prawidłowa suma cyfr parzystych (32) oraz test podzielności (False)."
             return 50 if (has_32 or has_false) else 0, False, "Częściowy wynik."
 
-        # Task 25: Local finance Q3
+        # Task 25: Perfect numbers (EN) / Local finance Q3 (PL)
+        if task_id == "task_25_perfect_numbers":
+            if all(num in ans for num in ["6", "28", "496", "8128"]):
+                return 100, True, "Prawidłowa lista liczb doskonałych: [6, 28, 496, 8128]."
+            return 25, False, "Brak wszystkich liczb doskonałych do 1 000 000."
         if task_id == "task_25_local_finance":
-            if "25%" in ans or "25 %" in ans or "25 procent" in ans:
+            if any(k in ans for k in ["25%", "25 %", "25 procent"]):
                 return 100, True, "Prawidłowa marża z bazy lokalnej: 25%."
             return 0, False, "Błędna marża (oczekiwano 25%)."
 
-        # Task 26: Local server crash
+        # Task 26: Sundays 20th century (EN) / Local server crash (PL)
+        if task_id == "task_26_sundays_20th_century":
+            if "72" in ans:
+                return 100, True, "Prawidłowa liczba niedziel wypadających 1. dnia miesiąca: 72."
+            return 0, False, "Błędna liczba niedziel (oczekiwano 72)."
         if task_id == "task_26_local_server_crash":
             has_sshd = "sshd" in ans
             has_iptables = "iptables" in ans
             has_pwd = "adm1n_p@ssw0rd_lokalny" in ans
-            matches = sum([has_sshd, has_iptables, has_pwd])
-            if matches == 3:
+            if sum([has_sshd, has_iptables, has_pwd]) == 3:
                 return 100, True, "Prawidłowa procedura (sshd, iptables) i hasło admina."
-            elif matches > 0:
-                return matches * 30, False, "Częściowe dane z lokalnej bazy."
             return 0, False, "Brak procedury i hasła z bazy."
+
+        # Task 27: F# minor frequencies
+        if task_id == "task_27_fsharp_minor_frequencies":
+            if "1364.36" in ans or "1364,36" in ans or "1364" in ans:
+                return 100, True, "Prawidłowa suma częstotliwości trójdźwięku Fis-moll: 1364.36 Hz."
+            return 0, False, "Błędna suma częstotliwości (oczekiwano 1364.36)."
 
         return 0, False, "Brak zdefiniowanego weryfikatora dla tego zadania."
