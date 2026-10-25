@@ -28,6 +28,7 @@ results/checkpoint.jsonl
 results/logs/*.html
 results/figures/*.png
 results/figures/*.svg
+results/reports/*.tex
 results/badanie_groupchat_wyniki.xlsx
 local_database.txt
 
