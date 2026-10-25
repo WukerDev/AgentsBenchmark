@@ -1,0 +1,68 @@
+system:
+  seed: 2026
+  default_provider: "ollama"   # Options: 'ollama', 'groq', 'openai', 'openrouter'
+  checkpoint_file: "results/checkpoint.jsonl"
+  excel_output: "results/badanie_groupchat_wyniki.xlsx"
+  local_db_file: "local_database.txt"
+
+execution:
+  max_group_turns: 15
+  max_solo_turns: 5
+  code_timeout_seconds: 15
+  web_search_max_results: 3
+
+providers:
+  ollama:
+    base_url: "http://localhost:11434/v1"
+    keep_alive: "5m"
+  groq:
+    base_url: "https://api.groq.com/openai/v1"
+    api_key_env: "GROQ_API_KEY"
+  openai:
+    base_url: "https://api.openai.com/v1"
+    api_key_env: "OPENAI_API_KEY"
+  openrouter:
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+
+models:
+  # Default Solo Agent model per provider
+  solo_model:
+    ollama: "qwen2.5:14b"
+    groq: "llama-3.3-70b-versatile"
+    openai: "gpt-4o-mini"
+    openrouter: "meta-llama/llama-3.3-70b-instruct"
+
+  # Default Jury models per provider
+  jury_models:
+    ollama:
+      - "phi4"
+      - "qwen2.5:14b"
+      - "gpt-oss:20b"
+    groq:
+      - "llama-3.3-70b-versatile"
+      - "mixtral-8x7b-32768"
+      - "gemma2-9b-it"
+    openai:
+      - "gpt-4o-mini"
+      - "gpt-4o"
+      - "gpt-3.5-turbo"
+    openrouter:
+      - "meta-llama/llama-3.3-70b-instruct"
+      - "mistralai/mixtral-8x7b-instruct"
+      - "google/gemma-2-9b-it"
+
+pricing_per_1m_tokens:
+  "qwen2.5:14b": 2.50
+  "qwen2.5-coder:14b": 2.50
+  "gemma2:9b": 0.50
+  "gemma2:2b": 0.15
+  "llama3.1:8b": 0.50
+  "gpt-oss:20b": 3.00
+  "phi4": 0.20
+  "llama-3.3-70b-versatile": 0.70
+  "mixtral-8x7b-32768": 0.27
+  "gemma2-9b-it": 0.20
+  "gpt-4o-mini": 0.30
+  "gpt-4o": 5.00
+  "default": 1.00
