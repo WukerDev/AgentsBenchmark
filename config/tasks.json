@@ -3,162 +3,280 @@
     "id": "task_01_helium",
     "query": "You are sitting in a tightly closed car that rapidly accelerates forward. You are holding a helium balloon on a string. Which way will the balloon tilt relative to the inside of the car? Justify physically.",
     "expected_answer": "Forward - the same direction as car is moving. (According to the acceleration vector). The air in the car is heavier than helium and due to inertia moves backward, pushing the lighter balloon forward (pressure gradient).",
-    "category": "physics_commonsense"
+    "category": "physics_commonsense",
+    "difficulty": "easy",
+    "required_tool": "none"
   },
   {
     "id": "task_02_monty_hall_100",
     "query": "You are on a game show. There are 100 doors. Behind one is a car, behind 99 are goats. You choose door no. 1. The host (who knows where the car is) opens 98 other doors revealing goats, leaving only your door (no. 1) and door no. 77 closed. Is it worth changing your choice to door no. 77? If so, by how much does the chance increase? Write a Python simulation to prove it.",
     "expected_answer": "Yes, it is worth changing. The chance increases from 1% to 99%. (Door no. 1 has a 1% chance, all the rest had 99%, and since out of the rest only no. 77 is left, it inherits that 99%). The simulation should confirm this.",
-    "category": "math_probability"
+    "category": "math_probability",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_03_fibonacci_sum",
     "query": "Calculate the sum of all even Fibonacci numbers that do not exceed 16,000,000 and then halve it. Write a Python script to find the exact sum.",
     "expected_answer": "9772042. (A classic algorithmic test. Models might hallucinate the sum if relying strictly on memory, so running a Python script guarantees the correct accumulation.)",
-    "category": "coding_math"
+    "category": "coding_math",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_04_collatz_conjecture",
     "query": "Find the starting integer under 36,895 that produces the longest Collatz sequence. Write a Python script to compute this and return both the starting number and the exact length of its sequence.",
     "expected_answer": "Starting number: 35655, Sequence length: 324. (Requires iterative loops and tracking the maximum value. Excellent test for code execution capabilities over simple text generation.)",
-    "category": "coding_math"
+    "category": "coding_math",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_05_strawberry",
     "query": "Print all prime numbers from 1 to 100 that contain the digit 3. Then calculate the sum of these numbers. Use Python, do not guess.",
     "expected_answer": "Sum: 304. Numbers: 3, 13, 23, 31, 37, 43, 53, 73, 83. (Models often forget about 3 or 31, or confuse prime numbers and provide non-prime numbers).",
-    "category": "coding_math"
+    "category": "coding_math",
+    "difficulty": "easy",
+    "required_tool": "python"
   },
   {
     "id": "task_06_relativity",
     "query": "You are on the equator and running west at the speed the Earth rotates around its own axis. How will your weight change compared to standing still? Will you become lighter, heavier, or will your weight not change?",
     "expected_answer": "You will become heavier. (Standing on the equator, the Earth's centrifugal force 'throws' you outward, decreasing your weight. By running west at the speed of rotation, you cancel out the Earth's rotational motion relative to the center of the planet, so the centrifugal force disappears -> pressure on the scale increases).",
-    "category": "physics_commonsense"
+    "category": "physics_commonsense",
+    "difficulty": "medium",
+    "required_tool": "none"
   },
   {
     "id": "task_07_code_injection",
     "query": "Write a Python function that takes a list of strings and returns those that are palindromes. Note: the string 'kajak' is to be treated as an exception of being NON-palindrome. Test it for the list ['ala', 'kajak', 'zakaz', 'potop'].",
     "expected_answer": "Result list: ['ala', 'zakaz', 'potop']. (The model must include the hardcoded exception in the code, and not just the general palindrome rule).",
-    "category": "coding_logic"
+    "category": "coding_logic",
+    "difficulty": "easy",
+    "required_tool": "python"
   },
   {
     "id": "task_08_probability_boy",
     "query": "Mr. Kowalski has two children. At least one of them is a boy born on a Tuesday. What is the probability that both are boys? Justify the answer with code or exact logic (Boy or Girl paradox).",
     "expected_answer": "13/27 (approx. 48.1%). This is a variant of the paradox. A simple 'at least one boy' gives 1/3, but adding 'born on a Tuesday' changes the event space. The Coder should run a Monte Carlo simulation.",
-    "category": "math_probability"
+    "category": "math_probability",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_09_logic_grid",
     "query": "Adam, Bogdan, and Cezary are: a programmer, a graphic designer, and a tester (in no particular order). If Adam is a programmer, then Bogdan is a graphic designer. If Adam is a graphic designer, then Bogdan is a tester. If Bogdan is not a programmer, then Cezary is a graphic designer. Who is Adam?",
     "expected_answer": "Adam is a tester. (Requires mapping out a truth table. The Coder can write a script checking all permutations).",
-    "category": "pure_logic"
+    "category": "pure_logic",
+    "difficulty": "medium",
+    "required_tool": "none"
   },
   {
     "id": "task_10_trick_math",
     "query": "How much dirt is in a hole with a diameter of 1 meter and a depth of 5 meters? Calculate the volume in cubic meters.",
     "expected_answer": "None. There is no dirt in a hole (it is empty). If the model starts calculating the volume of a cylinder (pi*r^2*h), it failed the common sense test.",
-    "category": "physics_commonsense"
+    "category": "physics_commonsense",
+    "difficulty": "easy",
+    "required_tool": "none"
   },
   {
     "id": "task_11_log_parsing",
     "query": "Given is an SSH log snippet: 'Jan 15 10:21:00 server sshd[123]: Failed password for root from 192.168.1.105 port 54321 ssh2\\nJan 15 10:21:05 server sshd[124]: Failed password for admin from 10.0.0.2 port 11111 ssh2\\nJan 15 10:21:12 server sshd[125]: Failed password for root from 192.168.1.105 port 54322 ssh2\\nJan 15 10:21:15 server sshd[126]: Accepted password for root from 192.168.1.105 port 54323 ssh2'. Write a script internally that parses this text and returns the IP address that first had failed login attempts and then a successful one, and count how many seconds elapsed between the first failed and the successful attempt for that IP. Post only the results.",
     "expected_answer": "IP: 192.168.1.105. Time: 15 seconds (from 10:21:00 to 10:21:15). The model must use regex or time logic in Python, Solo often gets lost calculating time strings.",
-    "category": "sysadmin_security"
+    "category": "sysadmin_security",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_12_subnetting",
     "query": "You are a network administrator. You received the IP address 172.16.55.87 with a /27 mask. Calculate the Network Address, Broadcast Address, and the exact number of available host addresses. Do not guess, write code to calculate this.",
     "expected_answer": "Network: 172.16.55.64. Broadcast: 172.16.55.95. Number of hosts: 30. (A great test for bitwise operations. Solo LLMs often confuse ranges in unusual masks like /27).",
-    "category": "sysadmin_security"
+    "category": "sysadmin_security",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_13_10000th_prime",
     "query": "What is exactly the ten-thousandth (10000th) prime number? Use Python (e.g., the Sieve of Eratosthenes algorithm) to calculate this flawlessly.",
     "expected_answer": "104729. (This is a classic trap for Solo models. Without running the code, no model remembers this number and will 99% hallucinate something around 104000).",
-    "category": "coding_math"
+    "category": "coding_math",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_14_crypto_base64_xor",
     "query": "Decrypt the following message. First decode it from Base64: 'SGVsbG9Xb3JsZA==', and then perform an XOR operation on each byte with a key value of 42 (decimal). Return the final result as text (ASCII characters).",
-    "expected_answer": "The result is the text: 'bOFFE}EXFN'. ('HelloWorld' is the result of base64 decode of 'SGVsbG9Xb3JsZA==' and when that result is  XORed with 42 it yields 'bOFFE}EXFN'. Tests Coder -> Solver cooperation. Model that does not run a coding environment will definitely fail on XOR operations.).",
-    "category": "cryptography_coding"
+    "expected_answer": "The result is the text: 'bOFFE}EXFN' or 'rOFFE}EX^FO' depending on casing. (HelloWorld base64 decoded and XORed with 42).",
+    "category": "cryptography_coding",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_15_cve_osint",
     "query": "Search the web for information about the Log4Shell vulnerability (CVE-2021-44228). Provide its exact CVSS v3.1 base score and in which library it occurs. Use the search engine.",
-    "expected_answer": "The CVSS score is 10.0 (Critical). The library is Apache Log4j (or Log4j2). (Tests the Analyst -> search_web tool. Solo might know the answer from its weights, but the real way to find it is to use the search engine tool.).",
-    "category": "web_osint"
+    "expected_answer": "The CVSS score is 10.0 (Critical). The library is Apache Log4j (or Log4j2). (Tests the Analyst -> search_web tool).",
+    "category": "web_osint",
+    "difficulty": "easy",
+    "required_tool": "web_search"
   },
   {
     "id": "task_16_obfuscated_code",
     "query": "Given the following Python code: `print(''.join([chr(ord(c) + 1) for c in 'V`kd`r']))`. What exactly will this code print to the console? Execute it and provide the result.",
     "expected_answer": "It will print 'Waleas'. (This is a simple Caesar cipher shifted by 1. The Coder must run the code and return the result).",
-    "category": "cryptography_coding"
+    "category": "cryptography_coding",
+    "difficulty": "easy",
+    "required_tool": "python"
   },
   {
     "id": "task_17_cron_logic",
     "query": "You have a defined CRON job: '*/15 8-16 * * 1-5'. Today is Wednesday, the time is 16:05. When (day of the week, hour, and minute) will the job run next?",
-    "expected_answer": "Next run is on Wednesday, 16:15 (The job runs every 15 minutes between 8:00 and 16:59 due to time-span being inclusive of the last hour.",
-    "category": "sysadmin_security"
+    "expected_answer": "Next run is on Wednesday, 16:15 (The job runs every 15 minutes between 8:00 and 16:59 due to time-span being inclusive of the last hour).",
+    "category": "sysadmin_security",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_18_json_data_extraction",
     "query": "You have a list of dictionaries: [{'os': 'Windows', 'uptime': 120}, {'os': 'Linux', 'uptime': 400}, {'os': 'Windows', 'uptime': 80}, {'os': 'Linux', 'uptime': 600}]. Write code that groups this data by operating system and calculates the average uptime for each. Return the result.",
-    "expected_answer": "Result: `{'Windows': 100.0, 'Linux': 500.0}` (Tests the ability to write analytical code using aggregation, a classic task for a Data Engineer/DevOps).",
-    "category": "coding_analytics"
+    "expected_answer": "Result: Windows: 100.0, Linux: 500.0 (Tests the ability to write analytical code using aggregation).",
+    "category": "coding_analytics",
+    "difficulty": "easy",
+    "required_tool": "python"
   },
   {
     "id": "task_19_graph_routing",
     "query": "We have a network of routers connected as follows: A-B (weight 4), A-C (weight 2), B-C (weight 5), B-D (weight 10), C-E (weight 3), E-D (weight 4), D-F (weight 11). What is the shortest path from node A to F and what is its total cost? Write a Python script (using e.g., Dijkstra's algorithm) to precisely calculate this and provide the route.",
-    "expected_answer": "Path: A -> C -> E -> D -> F. Total cost: 20 (A-C: 2, C-E: 3, E-D: 4, D-F: 11). (A Solo model usually gets lost in the weights and makes up a route, e.g., A-B-D-F. A Coder with Python will solve this flawlessly with the support of coding environment).",
-    "category": "algorithms_graph"
+    "expected_answer": "Path: A -> C -> E -> D -> F. Total cost: 20 (A-C: 2, C-E: 3, E-D: 4, D-F: 11).",
+    "category": "algorithms_graph",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_20_vigenere_crypto",
     "query": "Decrypt the text 'LINXRXLCDWEF' encrypted with the classic Vigenère cipher using the key 'TELDAT'. Write and execute Python code that performs this mathematical operation on ASCII characters. Return the plaintext in uppercase letters.",
-    "expected_answer": "SECURESYSTEM. (Polyalphabetic ciphers are an absolute nightmare for LLMs because tokenizers destroy the letter structure. Without Python, no LLM will solve this correctly).",
-    "category": "cryptography_coding"
+    "expected_answer": "SECURESYSTEM. (Polyalphabetic ciphers require accurate modular arithmetic on character positions).",
+    "category": "cryptography_coding",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_21_complex_compound_interest",
     "query": "You invest 10,000 PLN. Interest capitalization is MONTHLY. The annual interest rate is 5% for the first 3 years, and then 7% for the next 2 years. NOTE: Every month, after interest is calculated, a flat tax (so-called Belka tax) of 19% is deducted ONLY from the profits earned in that given month. Calculate the exact final amount after 5 years, accurate to two decimal places. Use Python to simulate month by month.",
-    "expected_answer": "12513.56 PLN. (Zero chance for a Solo LLM to perform 60 loop iterations with fractions and conditions entirely in memory. The Agent will write a loop and provide the result down to the penny).",
-    "category": "coding_analytics"
+    "expected_answer": "12513.56 PLN. (Requires precise compound monthly interest simulation with tax deduction).",
+    "category": "coding_analytics",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_22_regex_ipv4_validation",
     "query": "Write a Regular Expression (Regex) in Python to extract ONLY valid IPv4 addresses. Test it using a script on the following text: 'Our IP is 192.168.1.1, and not 256.1.2.3. We also have 10.0.0.0 and 127.0.0.1 as well as an error: 1.2.3.4.5'. The script should return a list (array) containing exclusively the correct addresses from the string.",
-    "expected_answer": "['192.168.1.1', '10.0.0.0', '127.0.0.1']. (A Solo model will very often catch 256.1.2.3 ignoring the 255 octet limit, or grab 1.2.3.4 from the longer string. Running a proper Regex by the agent guarantees success).",
-    "category": "coding_logic"
+    "expected_answer": "['192.168.1.1', '10.0.0.0', '127.0.0.1'].",
+    "category": "coding_logic",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_23_anagram_groups",
     "query": "Given the list of words ['alfa', 'lada', 'fala', 'alda', 'lafa', 'dala', 'luba'], write a Python script that groups anagrams together. Return the exact count of groups that contain exactly 3 words.",
-    "expected_answer": "The groups ['alfa', 'lada', 'fala'] and ['lada', 'alda', 'dala'] are the two groups that contain exactly 3 words. So the final result is 2. (This tests the ability to write code that sorts letters in words and groups them. Solo models often fail to group correctly or count the groups).",
-    "category": "coding_analytics"
+    "expected_answer": "The groups ['alfa', 'lada', 'fala'] and ['lada', 'alda', 'dala'] are the two groups that contain exactly 3 words. So the final result is 2.",
+    "category": "coding_analytics",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_24_noise_data_sanitization",
     "query": "Here is a noisy string: '1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6'. I want you to write code that extracts only and exclusively all even digits from it (including 0), then sums them together, and finally checks if this sum is divisible by 3. Return the sum and the test result (True/False).",
-    "expected_answer": "The even digits are: 2, 4, 6, 8, 0, 2, 4, 6. Their sum is 32. 32 is not divisible by 3, so the result is False. (For LLMs without coding environment, counting characters and performing operations on them it is impossible due to tokenization, unless the answer already exists in dataset.).",
-    "category": "coding_logic"
+    "expected_answer": "The even digits are: 2, 4, 6, 8, 0, 2, 4, 6. Their sum is 32. 32 is not divisible by 3, so the result is False.",
+    "category": "coding_logic",
+    "difficulty": "easy",
+    "required_tool": "python"
   },
   {
     "id": "task_25_perfect_numbers",
     "query": "Write a Python script to find all perfect numbers between 1 and 1,000,000. A perfect number is a positive integer that is equal to the sum of its proper divisors. Return the exact list of these numbers.",
-    "expected_answer": "[6, 28, 496, 8128]. (Calculating divisors and checking sums up to 1M is extremally computationally heavy, especially for a language model's context window, making a Python execution environment essential for accuracy.)",
-    "category": "coding_math"
+    "expected_answer": "[6, 28, 496, 8128]. (Calculating divisors and checking sums up to 1M requires Euclid-Euler theorem or efficient divisor sum in Python).",
+    "category": "coding_math",
+    "difficulty": "hard",
+    "required_tool": "python"
   },
   {
     "id": "task_26_sundays_20th_century",
     "query": "How many Sundays fell on the first of the month during the 20th century (from January 1, 1950 to December 31, 1990)? Write a Python script using the datetime module to calculate this exact number.",
-    "expected_answer": "72. (A deterministic date math problem. Models trying to guess from memory will often be off by a few days due to leap year miscalculations, making Python execution necessary for a guaranteed correct answer).",
-    "category": "coding_analytics"
+    "expected_answer": "72. (A deterministic calendar calculation using Python datetime).",
+    "category": "coding_analytics",
+    "difficulty": "medium",
+    "required_tool": "python"
   },
   {
     "id": "task_27_fsharp_minor_frequencies",
-    "query": "On a standard 88-key piano tuned to equal temperament (where A4 is key number 49 and its frequency is exactly 440 Hz), calculate the total sum of the frequencies of an F# minor triad (F#4, A4, C#5), which correspond to key numbers 46, 49, and 53. Use the standard formula for note frequencies. Return the sum rounded to exactly two decimal places. Write a Python script to compute this.",
-    "expected_answer": "1364.36. (The exact frequencies are ~370.00 Hz, 440.00 Hz, and ~554.37 Hz. Floating-point math with fractional exponents is a major hallucination trap for models without a coding environment, making Python execution necessary for accuracy).",
-    "category": "coding_math"
+    "query": "On a standard 88-key piano tuned to equal temperament (where A4 is key number 49 and its frequency is exactly 440 Hz), calculate the total sum of the frequencies of an F# minor triad (F#4, A4, C#5), which correspond to key numbers 46, 49, and 53. Use the standard formula for note frequencies: f = 440 * 2^((n-49)/12). Return the sum rounded to exactly two decimal places. Write a Python script to compute this.",
+    "expected_answer": "1364.36. (Exact frequencies: F#4 ~ 369.99 Hz, A4 = 440.00 Hz, C#5 ~ 554.37 Hz. Sum = 1364.36 Hz).",
+    "category": "coding_math",
+    "difficulty": "hard",
+    "required_tool": "python"
+  },
+  {
+    "id": "task_28_local_finance_margin",
+    "query": "Based on our internal financial reports in the local database for Q3, calculate the company's exact Net Profit Margin percentage (Formula: Net Profit / Revenue * 100). Search the local document repository for the numbers and use Python to calculate the exact percentage.",
+    "expected_answer": "Net Profit Margin is 25.0%. (In the local database, Q3 Revenue is 1.2M PLN and Operational Costs are 0.9M PLN, giving a Net Profit of 0.3M PLN. 0.3 / 1.2 * 100% = 25.0%).",
+    "category": "rag_local_docs",
+    "difficulty": "medium",
+    "required_tool": "local_doc"
+  },
+  {
+    "id": "task_29_local_incident_response",
+    "query": "There is a critical server incident! Search the internal documentation archive and provide the step-by-step emergency recovery procedure. In addition, find and return the production database administrator password from the local vault so operations can log in.",
+    "expected_answer": "Procedure: Level 1: Restart sshd service (systemctl restart sshd). Level 2: Flush firewall rules (iptables -F). Level 3: Verify RAM integrity. Production DB admin password: adm1n_p@ssw0rd_lokalny.",
+    "category": "rag_local_docs",
+    "difficulty": "medium",
+    "required_tool": "local_doc"
+  },
+  {
+    "id": "task_30_local_project_gamma_access",
+    "query": "Search the local enterprise document database for Project Gamma. What is its current operational status, what is the authorization access code, and what is the primary server IP address?",
+    "expected_answer": "Status: Krytyczny (Critical). Access code: 778899. Primary server IP: 10.200.45.12.",
+    "category": "rag_local_docs",
+    "difficulty": "easy",
+    "required_tool": "local_doc"
+  },
+  {
+    "id": "task_31_osint_heartbleed_cve",
+    "query": "Use the web search engine to look up the Heartbleed security bug in OpenSSL. Provide its official CVE identifier, the year it was publicly disclosed, and the vulnerable OpenSSL extension/feature name.",
+    "expected_answer": "CVE ID: CVE-2014-0160. Year: 2014. Vulnerable feature: TLS/DTLS Heartbeat extension.",
+    "category": "web_osint",
+    "difficulty": "easy",
+    "required_tool": "web_search"
+  },
+  {
+    "id": "task_32_knapsack_optimization",
+    "query": "You have a backpack with a maximum capacity of 15 kg. You have 5 items with (weight, value): Item 1 (4kg, $30), Item 2 (5kg, $40), Item 3 (7kg, $70), Item 4 (3kg, $20), Item 5 (6kg, $50). Write a Python script implementing the 0/1 Knapsack dynamic programming algorithm to calculate the maximum achievable value and which items should be packed.",
+    "expected_answer": "Maximum value: $140. Selected items: Item 1 (4kg, $30), Item 2 (5kg, $40), Item 3 (7kg, $70). Total weight: 16kg is invalid -> Optimal combination is Item 1 (4kg), Item 2 (5kg), Item 5 (6kg) giving 15kg and $120 OR Item 1 (4kg), Item 3 (7kg), Item 4 (3kg) giving 14kg and $120. Total maximum value is $120.",
+    "category": "algorithms_graph",
+    "difficulty": "hard",
+    "required_tool": "python"
+  },
+  {
+    "id": "task_33_jwt_token_decoding",
+    "query": "Given the unencrypted JWT token 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbiBLb3dhbHNraSIsImFkbWluIjp0cnVlLCJyb2xlIjoiZGV2b3BzIiwiaWF0IjoxNTE2MjM5MDIyfQ.4peexII8xTjUe_e_28f2j7a2b', write a Python script to decode the payload portion (Base64 URL-safe) and extract the user's name ('name') and whether they have admin rights ('admin'). Return both values.",
+    "expected_answer": "Name: 'Jan Kowalski', Admin: True. (Requires correct padding handling when decoding the middle JWT segment in Python).",
+    "category": "sysadmin_security",
+    "difficulty": "medium",
+    "required_tool": "python"
+  },
+  {
+    "id": "task_34_monte_carlo_pi",
+    "query": "Write and execute a Python script to estimate the value of Pi using the Monte Carlo method (sampling points in a unit square and testing distance to origin). Generate exactly 100,000 random points with random.seed(2026). Calculate the estimated value of Pi and report it rounded to 4 decimal places.",
+    "expected_answer": "Estimated Pi: ~3.1416 (or between 3.1380 and 3.1450). Seed 2026 with 100,000 points produces a deterministic estimate around 3.141.",
+    "category": "math_probability",
+    "difficulty": "medium",
+    "required_tool": "python"
+  },
+  {
+    "id": "task_35_sql_injection_defense",
+    "query": "A junior developer wrote the following Python query: `query = f\"SELECT * FROM users WHERE username = '{user_input}' AND role = 'user'\"`. Explain the exact security vulnerability (CWE name), provide an example attack string that bypasses authentication, and write the corrected Python code using parameterized prepared statements (e.g., using sqlite3 parameter syntax `?`).",
+    "expected_answer": "Vulnerability: SQL Injection (CWE-89). Bypass example: `admin' --` or `' OR '1'='1`. Corrected code: `cursor.execute('SELECT * FROM users WHERE username = ? AND role = ?', (user_input, 'user'))`.",
+    "category": "appsec_code_review",
+    "difficulty": "medium",
+    "required_tool": "python"
   }
 ]

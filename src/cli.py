@@ -26,6 +26,7 @@ def run(
     provider: Optional[str] = typer.Option(None, "--provider", "-p", help="Dostawca LLM: ollama, groq, openai, openrouter"),
     tasks: Optional[str] = typer.Option(None, "--tasks", "-t", help="Lista ID zadań rozdzielona przecinkami (np. task_01_helium,task_02_monty_hall_100)"),
     category: Optional[str] = typer.Option(None, "--category", "-c", help="Filtruj zadania wg kategorii (np. math_probability, sysadmin_security)"),
+    difficulty: Optional[str] = typer.Option(None, "--difficulty", "-d", help="Filtruj zadania wg trudności (easy, medium, hard)"),
     resume: bool = typer.Option(True, "--resume/--no-resume", help="Wznawiaj od ostatniego checkpointu bez powtarzania zrobionych zadań"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Szybki test potoku bez odpytywania LLM (mock)")
 ):
@@ -37,6 +38,7 @@ def run(
         provider=provider,
         task_filter=task_list,
         category_filter=category,
+        difficulty_filter=difficulty,
         resume=resume,
         dry_run=dry_run
     )

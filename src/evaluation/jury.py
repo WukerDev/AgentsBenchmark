@@ -1,6 +1,7 @@
 from __future__ import annotations
 import re
 import json
+import numpy as np
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from src.llm.client import UnifiedLLMClient
@@ -16,16 +17,10 @@ class JuryEvaluation:
     hallucination_multi: bool
     jury_reasons: str
     judge_total_cost: float
+    jury_std_dev: float
     individual_scores: List[Dict[str, Any]]
 
 class LLMJury:
-    """
-    Multi-judge LLM panel evaluating reasoning progression across 4 milestones:
-    - Solo (ReAct)
-    - Multi-Agent Turn 5 Snapshot
-    - Multi-Agent Turn 10 Snapshot
-    - Multi-Agent Final Answer
-    """
     def __init__(self, provider: Optional[str] = None, models: Optional[List[str]] = None):
         self.provider = provider or config.system.default_provider
         self.client = UnifiedLLMClient(provider=self.provider)
@@ -153,6 +148,8 @@ Zwróć TYLKO czysty obiekt JSON (bez znaczników markdown, bez zbędnego tekstu
         avg_10 = round(sum(scores_10) / len(scores_10), 1) if scores_10 else 0.0
         avg_fin = round(sum(scores_final) / len(scores_final), 1) if scores_final else 0.0
 
+        std_dev = round(float(np.std(scores_final)), 2) if scores_final else 0.0
+
         consensus_h_solo = sum(hallucination_solo_flags) > (len(self.models) / 2)
         consensus_h_multi = sum(hallucination_multi_flags) > (len(self.models) / 2)
 
@@ -165,5 +162,6 @@ Zwróć TYLKO czysty obiekt JSON (bez znaczników markdown, bez zbędnego tekstu
             hallucination_multi=consensus_h_multi,
             jury_reasons=" | ".join(jury_reasons),
             judge_total_cost=total_judge_cost,
+            jury_std_dev=std_dev,
             individual_scores=individual_results
         )

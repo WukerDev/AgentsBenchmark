@@ -34,6 +34,8 @@ class SoloAgentRunner:
         total_cost = 0.0
         turn_count = 0
         final_answer = ""
+        tool_counts: Dict[str, int] = {"python": 0, "web_search": 0, "local_docs": 0}
+        tool_error_count = 0
         max_turns = config.execution.max_solo_turns
 
         while turn_count < max_turns:
@@ -59,6 +61,11 @@ class SoloAgentRunner:
             tool_output, tool_time, tool_results = process_tools_in_response(response_text)
             total_tool_time += tool_time
 
+            for tr in tool_results:
+                tool_counts[tr.tool_name] = tool_counts.get(tr.tool_name, 0) + 1
+                if "BŁĄD" in tr.output or "Error" in tr.output or "Traceback" in tr.output:
+                    tool_error_count += 1
+
             chat_history += f"\n\n--- Tura {turn_count} (Solo ReAct) ---\n{response_text}"
             if tool_output:
                 chat_history += tool_output
@@ -79,6 +86,8 @@ class SoloAgentRunner:
             "tokens": total_tokens,
             "cost": round(total_cost, 4),
             "turns": turn_count,
+            "tool_counts": tool_counts,
+            "tool_error_count": tool_error_count,
             "chat_history": chat_history,
             "model": self.model
         }

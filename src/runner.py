@@ -27,6 +27,7 @@ class BenchmarkRunner:
         provider: Optional[str] = None,
         task_filter: Optional[List[str]] = None,
         category_filter: Optional[str] = None,
+        difficulty_filter: Optional[str] = None,
         resume: bool = True,
         dry_run: bool = False,
         no_live: bool = False
@@ -34,6 +35,7 @@ class BenchmarkRunner:
         self.provider = provider or config.system.default_provider
         self.task_filter = task_filter
         self.category_filter = category_filter
+        self.difficulty_filter = difficulty_filter
         self.resume = resume
         self.dry_run = dry_run
         self.no_live = no_live
@@ -57,6 +59,9 @@ class BenchmarkRunner:
 
         if self.category_filter:
             all_tasks = [t for t in all_tasks if t.get("category") == self.category_filter]
+
+        if self.difficulty_filter:
+            all_tasks = [t for t in all_tasks if t.get("difficulty") == self.difficulty_filter]
 
         if self.task_filter:
             all_tasks = [t for t in all_tasks if t["id"] in self.task_filter]
@@ -96,6 +101,8 @@ class BenchmarkRunner:
             for idx, task in enumerate(self.tasks):
                 task_id = task["id"]
                 category = task.get("category", "general")
+                difficulty = task.get("difficulty", "medium")
+                required_tool = task.get("required_tool", "none")
 
                 if task_id in completed_records:
                     continue
@@ -105,9 +112,23 @@ class BenchmarkRunner:
 
                 if self.dry_run:
                     time.sleep(0.3)
-                    solo_res = {"final_answer": "Dry run mock answer", "generation_time": 0.1, "tool_time": 0.0, "total_time": 0.1, "tokens": 100, "cost": 0.0001, "turns": 1, "chat_history": "Mock history"}
-                    group_res = {"final_answer": "Dry run mock answer", "snapshot_5": "Mock 5", "snapshot_10": "Mock 10", "generation_time": 0.2, "tool_time": 0.0, "total_time": 0.2, "tokens": 300, "cost": 0.0003, "turns": 3, "agent_path": "analyst -> solver -> secretary", "chat_history": "Mock swarm history"}
-                    scores = {"score_solo": 80.0, "score_multi_5": 70.0, "score_multi_10": 85.0, "score_multi_final": 95.0, "hallucination_solo": False, "hallucination_multi": False, "jury_reasons": "[Mock Jury]: Poprawne", "judge_total_cost": 0.0001}
+                    solo_res = {
+                        "final_answer": "Dry run mock answer", "generation_time": 0.1, "tool_time": 0.0,
+                        "total_time": 0.1, "tokens": 100, "cost": 0.0001, "turns": 1,
+                        "tool_counts": {"python": 1}, "tool_error_count": 0, "chat_history": "Mock history"
+                    }
+                    group_res = {
+                        "final_answer": "Dry run mock answer", "snapshot_5": "Mock 5", "snapshot_10": "Mock 10",
+                        "generation_time": 0.2, "tool_time": 0.0, "total_time": 0.2, "tokens": 300,
+                        "cost": 0.0003, "turns": 3, "agent_path": "analyst -> solver -> secretary",
+                        "role_counts": {"analyst": 1, "solver": 1, "secretary": 1},
+                        "tool_counts": {"python": 1}, "tool_error_count": 0, "chat_history": "Mock swarm history"
+                    }
+                    scores = {
+                        "score_solo": 80.0, "score_multi_5": 70.0, "score_multi_10": 85.0, "score_multi_final": 95.0,
+                        "hallucination_solo": False, "hallucination_multi": False, "jury_reasons": "[Mock Jury]: Poprawne",
+                        "judge_total_cost": 0.0001, "jury_std_dev": 2.5
+                    }
                 else:
                     live_ui.set_step(f"Zadanie [{idx+1}/{total_tasks_count}]: Uruchamiam Solo ReAct...")
                     live.update(live_ui.get_renderable())
@@ -135,21 +156,26 @@ class BenchmarkRunner:
                         "hallucination_solo": jury_eval.hallucination_solo,
                         "hallucination_multi": jury_eval.hallucination_multi,
                         "jury_reasons": jury_eval.jury_reasons,
-                        "judge_total_cost": jury_eval.judge_total_cost
+                        "judge_total_cost": jury_eval.judge_total_cost,
+                        "jury_std_dev": jury_eval.jury_std_dev
                     }
 
                 gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(task_id, solo_res["final_answer"])
                 gt_multi_score, gt_multi_ok, gt_multi_expl = GroundTruthVerifier.verify(task_id, group_res["final_answer"])
 
                 multi_total_cost = group_res["cost"] + scores.get("judge_total_cost", 0.0)
+                debate_gain = round(scores.get("score_multi_final", 0.0) - scores.get("score_multi_5", 0.0), 1)
 
                 row_record = {
                     "task_id": task_id,
                     "category": category,
+                    "difficulty": difficulty,
+                    "required_tool": required_tool,
                     "score_solo": scores.get("score_solo", 0.0),
                     "score_multi_5": scores.get("score_multi_5", 0.0),
                     "score_multi_10": scores.get("score_multi_10", 0.0),
                     "score_multi_final": scores.get("score_multi_final", 0.0),
+                    "debate_gain": debate_gain,
                     "gt_solo_score": gt_solo_score,
                     "gt_multi_score": gt_multi_score,
                     "hallucination_solo": scores.get("hallucination_solo", False),
@@ -166,6 +192,10 @@ class BenchmarkRunner:
                     "multi_cost_usd": multi_total_cost,
                     "solo_turns": solo_res["turns"],
                     "multi_turns": group_res["turns"],
+                    "solo_tools_used": sum(solo_res.get("tool_counts", {}).values()),
+                    "multi_tools_used": sum(group_res.get("tool_counts", {}).values()),
+                    "multi_tool_errors": group_res.get("tool_error_count", 0),
+                    "jury_std_dev": scores.get("jury_std_dev", 0.0),
                     "agent_path": group_res.get("agent_path", ""),
                     "jury_reason": scores.get("jury_reasons", "")
                 }

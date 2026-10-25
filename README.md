@@ -85,8 +85,11 @@ python main.py run --provider groq
 # Uruchomienie tylko wybranych zadań
 python main.py run --tasks task_01_helium,task_04_lcm_problem,task_11_log_parsing
 
-# Filtrowanie zadań wg kategorii (np. math_probability, sysadmin_security, coding_math)
-python main.py run --category sysadmin_security
+# Filtrowanie zadań wg kategorii (np. math_probability, sysadmin_security, coding_math, rag_local_docs)
+python main.py run --category rag_local_docs
+
+# Filtrowanie zadań wg poziomu trudności (easy, medium, hard)
+python main.py run --difficulty hard
 
 # Szybki test działania potoku bez odpytywania modeli (dry-run)
 python main.py run --dry-run
@@ -114,7 +117,7 @@ AiAgentsTaskSolvingBenchmark/
 ├── config/
 │   ├── benchmark_config.yaml       # Główna konfiguracja: modele, timeouty, ceny tokenów
 │   ├── agents.json                 # Role i definicje promptów agentów
-│   └── tasks.json                  # 26 zadań badawczych z kategoriami
+│   └── tasks.json                  # 35 zrównoważonych zadań badawczych z kategoriami i trudnością
 ├── src/
 │   ├── config.py                   # Pydantic Settings
 │   ├── runner.py                   # Główny silnik koordynacji badania

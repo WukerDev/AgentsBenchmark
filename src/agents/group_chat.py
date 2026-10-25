@@ -47,7 +47,7 @@ class MultiAgentSwarmRunner:
 
         if last_speaker_id == "critic":
             last_msg = history.split("---")[-1].strip().upper()
-            if "ZATWIERDZAM" in last_msg:
+            if "ZATWIERDZAM" in last_msg or "APPROVE" in last_msg:
                 return "secretary", LLMResponse(text="secretary", tokens=0, generation_time=0.0, cost=0.0, model="", provider=self.provider)
 
         devil_count = history.count("Adwokat Diabła") + history.count("Devil's Advocate")
@@ -127,6 +127,9 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
         final_answer = ""
         last_speaker = "none"
         agent_path: List[str] = []
+        role_counts: Dict[str, int] = {}
+        tool_counts: Dict[str, int] = {"python": 0, "web_search": 0, "local_docs": 0}
+        tool_error_count = 0
         snapshot_5 = ""
         snapshot_10 = ""
         max_turns = config.execution.max_group_turns
@@ -148,6 +151,8 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
                 break
 
             agent_path.append(next_agent_id)
+            role_counts[next_agent_id] = role_counts.get(next_agent_id, 0) + 1
+
             cur_agent_cfg = self.agents_map.get(next_agent_id)
             if not cur_agent_cfg:
                 break
@@ -159,7 +164,7 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
                 f"ZADANIE: {task_query}\n\n"
                 f"OSTATNIE WYDARZENIA W HISTORII:\n{recent_history}\n\n"
                 f"Jesteś agentem: {cur_agent_cfg.role} ({cur_agent_cfg.id}).\n"
-                f"Użyj narzędzia jeśli potrzebujesz (SEARCH:, LOCAL_DOC:, ```python...```)."
+                f"Użyj narzędzia jeśli potrzebujesz (SEARCH: zapytanie, LOCAL_DOC: zapytanie, ```python...```)."
             )
 
             agent_res = self.client.generate(
@@ -176,6 +181,11 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
 
             tool_output, tool_time, tool_results = process_tools_in_response(response_text)
             total_tool_time += tool_time
+
+            for tr in tool_results:
+                tool_counts[tr.tool_name] = tool_counts.get(tr.tool_name, 0) + 1
+                if "BŁĄD" in tr.output or "Error" in tr.output or "Traceback" in tr.output:
+                    tool_error_count += 1
 
             if tool_output:
                 response_text += tool_output
@@ -211,5 +221,8 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
             "tokens": total_tokens,
             "cost": round(total_cost, 4),
             "agent_path": " -> ".join(agent_path),
+            "role_counts": role_counts,
+            "tool_counts": tool_counts,
+            "tool_error_count": tool_error_count,
             "chat_history": chat_history
         }

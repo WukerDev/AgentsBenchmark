@@ -4,6 +4,13 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 
+def compute_cohens_d(x: np.ndarray, y: np.ndarray) -> float:
+    diff = x - y
+    std_diff = np.std(diff, ddof=1)
+    if std_diff == 0:
+        return 0.0
+    return float(np.mean(diff) / std_diff)
+
 def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
     if df.empty or "score_solo" not in df or "score_multi_final" not in df:
         return {}
@@ -19,7 +26,8 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         "multi_mean": round(float(np.mean(multi_scores)), 2),
         "multi_std": round(float(np.std(multi_scores)), 2),
         "multi_median": round(float(np.median(multi_scores)), 2),
-        "score_delta": round(float(np.mean(multi_scores) - np.mean(solo_scores)), 2)
+        "score_delta": round(float(np.mean(multi_scores) - np.mean(solo_scores)), 2),
+        "cohens_d": round(compute_cohens_d(multi_scores, solo_scores), 3)
     }
 
     if len(solo_scores) >= 5 and np.any(solo_scores != multi_scores):
@@ -55,11 +63,23 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         ).round(2).to_dict(orient="index")
         stats_dict["category_breakdown"] = cat_stats
 
+    if "difficulty" in df:
+        diff_stats = df.groupby("difficulty").agg(
+            solo_avg=("score_solo", "mean"),
+            multi_avg=("score_multi_final", "mean"),
+            count=("task_id", "count")
+        ).round(2).to_dict(orient="index")
+        stats_dict["difficulty_breakdown"] = diff_stats
+
     if "score_multi_5" in df and "score_multi_10" in df:
         stats_dict["evolution"] = {
             "turn_5_mean": round(float(df["score_multi_5"].mean()), 2),
             "turn_10_mean": round(float(df["score_multi_10"].mean()), 2),
-            "final_mean": round(float(df["score_multi_final"].mean()), 2)
+            "final_mean": round(float(df["score_multi_final"].mean()), 2),
+            "debate_gain": round(float(df["score_multi_final"].mean() - df["score_multi_5"].mean()), 2)
         }
+
+    if "jury_std_dev" in df:
+        stats_dict["mean_jury_std_dev"] = round(float(df["jury_std_dev"].mean()), 2)
 
     return stats_dict

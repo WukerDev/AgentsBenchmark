@@ -25,6 +25,7 @@ class BenchmarkVisualizer:
 
         cls.plot_overview_dashboard(df, output_dir / "dashboard_porownawczy.png")
         cls.plot_category_comparison(df, output_dir / "kategorie_porownanie.png")
+        cls.plot_difficulty_scaling(df, output_dir / "trudnosc_skalowanie.png")
         cls.plot_turn_evolution(df, output_dir / "ewolucja_tur.png")
         cls.plot_pareto_cost_score(df, output_dir / "pareto_koszt_wynik.png")
 
@@ -86,6 +87,37 @@ class BenchmarkVisualizer:
         plt.close(fig)
 
     @classmethod
+    def plot_difficulty_scaling(cls, df: pd.DataFrame, save_path: Path):
+        if "difficulty" not in df:
+            return
+
+        order = [d for d in ["easy", "medium", "hard"] if d in df["difficulty"].unique()]
+        grouped = df.groupby("difficulty")[["score_solo", "score_multi_final"]].mean().reindex(order).reset_index()
+
+        fig, ax = plt.subplots(figsize=(8, 5))
+        x = np.arange(len(grouped))
+        width = 0.35
+
+        b1 = ax.bar(x - width/2, grouped["score_solo"], width, label="Solo ReAct", color="#718096")
+        b2 = ax.bar(x + width/2, grouped["score_multi_final"], width, label="Multi-Agent Swarm", color="#38A169")
+
+        ax.set_title("Skalowanie Skuteczności wg Poziomu Trudności")
+        ax.set_ylabel("Średni Wynik Punktowy (0-100)")
+        ax.set_xticks(x)
+        ax.set_xticklabels([d.capitalize() for d in grouped["difficulty"]])
+        ax.set_ylim(0, 110)
+        ax.legend()
+
+        for b in list(b1) + list(b2):
+            h = b.get_height()
+            if not np.isnan(h):
+                ax.text(b.get_x() + b.get_width()/2., h + 1.5, f"{h:.1f}", ha="center", va="bottom", fontsize=9, fontweight="bold")
+
+        plt.tight_layout()
+        fig.savefig(save_path, dpi=300)
+        plt.close(fig)
+
+    @classmethod
     def plot_turn_evolution(cls, df: pd.DataFrame, save_path: Path):
         if "score_multi_5" not in df or "score_multi_10" not in df:
             return
@@ -117,7 +149,7 @@ class BenchmarkVisualizer:
             return
 
         cat_grouped = df.groupby("category")[["score_solo", "score_multi_final"]].mean().reset_index()
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(11, 6))
 
         x = np.arange(len(cat_grouped))
         width = 0.35
@@ -128,7 +160,7 @@ class BenchmarkVisualizer:
         ax.set_title("Skuteczność Rozwiązywania wg Kategorii Zadań")
         ax.set_ylabel("Średni Wynik (0-100)")
         ax.set_xticks(x)
-        ax.set_xticklabels([c.replace("_", "\n") for c in cat_grouped["category"]], fontsize=9)
+        ax.set_xticklabels([c.replace("_", "\n") for c in cat_grouped["category"]], fontsize=8)
         ax.set_ylim(0, 110)
         ax.legend()
 

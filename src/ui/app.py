@@ -56,11 +56,23 @@ if provider != "ollama":
 
 st.sidebar.markdown("---")
 categories = sorted(list(set(t.get("category", "ogólne") for t in ALL_TASKS)))
-selected_category = st.sidebar.selectbox("Filtruj zadania wg kategorii:", ["Wszystkie"] + categories)
+selected_category = st.sidebar.selectbox("Filtruj wg kategorii:", ["Wszystkie"] + categories)
 
-filtered_tasks = ALL_TASKS if selected_category == "Wszystkie" else [t for t in ALL_TASKS if t.get("category") == selected_category]
+difficulties = ["Wszystkie", "easy", "medium", "hard"]
+selected_difficulty = st.sidebar.selectbox("Filtruj wg trudności:", difficulties)
+
+filtered_tasks = ALL_TASKS
+if selected_category != "Wszystkie":
+    filtered_tasks = [t for t in filtered_tasks if t.get("category") == selected_category]
+if selected_difficulty != "Wszystkie":
+    filtered_tasks = [t for t in filtered_tasks if t.get("difficulty") == selected_difficulty]
+
+if not filtered_tasks:
+    st.sidebar.error("Brak zadań spełniających kryteria filtrów.")
+    st.stop()
+
 task_ids = [t["id"] for t in filtered_tasks]
-selected_task_id = st.sidebar.selectbox("Wybierz zadanie:", task_ids)
+selected_task_id = st.sidebar.selectbox("Wybierz zadanie do testu:", task_ids)
 current_task = next(t for t in filtered_tasks if t["id"] == selected_task_id)
 
 st.markdown('<div class="main-header">AiAgents Task Solving Benchmark</div>', unsafe_allow_html=True)
@@ -69,7 +81,11 @@ st.markdown('<div class="sub-header">Platforma badawcza: Solo ReAct vs Multi-Age
 tab_test, tab_results, tab_latex = st.tabs(["🧪 Interaktywny Test Zadania", "📊 Wyniki Zbiorcze & Statystyki", "📄 Eksport do Pracy (LaTeX & Excel)"])
 
 with tab_test:
-    st.subheader(f"Zadanie: `{current_task['id']}`")
+    diff_tag = current_task.get('difficulty', 'medium').capitalize()
+    tool_tag = current_task.get('required_tool', 'none').upper()
+    cat_tag = current_task.get('category', 'general')
+
+    st.subheader(f"Zadanie: `{current_task['id']}`  |  🏷️ `{cat_tag}`  |  ⚡ `{diff_tag}`  |  🛠️ `{tool_tag}`")
     col_q, col_ans = st.columns([2, 1])
     with col_q:
         st.info(f"**Pytanie / Problem:**\n\n{current_task['query']}")
@@ -139,7 +155,7 @@ with tab_test:
         col_j1.metric("Jury Solo", f"{jury_res.score_solo:.0f}/100")
         col_j2.metric("Jury Multi (Tura 5)", f"{jury_res.score_multi_5:.0f}/100")
         col_j3.metric("Jury Multi (Tura 10)", f"{jury_res.score_multi_10:.0f}/100")
-        col_j4.metric("Jury Multi (Finał)", f"{jury_res.score_multi_final:.0f}/100")
+        col_j4.metric("Jury Multi (Finał)", f"{jury_res.score_multi_final:.0f}/100", delta=f"{jury_res.score_multi_final - jury_res.score_multi_5:+.0f} z debaty")
 
         st.info(f"**Uzasadnienie Sędziów:**\n\n{jury_res.jury_reasons}")
 
@@ -158,21 +174,29 @@ with tab_results:
             st.dataframe(df, use_container_width=True)
 
             stats = compute_benchmark_statistics(df)
-            col_s1, col_s2, col_s3, col_s4 = st.columns(4)
+            col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
             col_s1.metric("Średni Wynik Solo", f"{stats.get('solo_mean', 0)} pkt")
             col_s2.metric("Średni Wynik Multi", f"{stats.get('multi_mean', 0)} pkt", delta=f"{stats.get('score_delta', 0)} pkt")
-            col_s3.metric("Multi Win Rate", f"{stats.get('multi_win_rate', 0)}%")
-            col_s4.metric("Wilcoxon p-value", f"{stats.get('wilcoxon_pvalue', 'N/A')}")
+            col_s3.metric("Rozmiar Efektu (Cohen's d)", f"{stats.get('cohens_d', 'N/A')}")
+            col_s4.metric("Multi Win Rate", f"{stats.get('multi_win_rate', 0)}%")
+            col_s5.metric("Wilcoxon p-value", f"{stats.get('wilcoxon_pvalue', 'N/A')}")
 
             st.markdown("---")
             st.subheader("Wykresy do Pracy Inżynierskiej")
             fig_dir = BASE_DIR / "results" / "figures"
             BenchmarkVisualizer.generate_all_plots(df, fig_dir, show=False)
 
-            if (fig_dir / "dashboard_porownawczy.png").exists():
-                st.image(str(fig_dir / "dashboard_porownawczy.png"), caption="Podsumowanie Ogólne", use_container_width=True)
-            if (fig_dir / "kategorie_porownanie.png").exists():
-                st.image(str(fig_dir / "kategorie_porownanie.png"), caption="Skuteczność wg Kategorii", use_container_width=True)
+            c_fig1, c_fig2 = st.columns(2)
+            with c_fig1:
+                if (fig_dir / "dashboard_porownawczy.png").exists():
+                    st.image(str(fig_dir / "dashboard_porownawczy.png"), caption="Podsumowanie Ogólne", use_container_width=True)
+                if (fig_dir / "trudnosc_skalowanie.png").exists():
+                    st.image(str(fig_dir / "trudnosc_skalowanie.png"), caption="Skalowanie wg Poziomu Trudności", use_container_width=True)
+            with c_fig2:
+                if (fig_dir / "kategorie_porownanie.png").exists():
+                    st.image(str(fig_dir / "kategorie_porownanie.png"), caption="Skuteczność wg Kategorii", use_container_width=True)
+                if (fig_dir / "ewolucja_tur.png").exists():
+                    st.image(str(fig_dir / "ewolucja_tur.png"), caption="Progres Jakości w Turach", use_container_width=True)
         else:
             st.warning("Brak zapisanych wyników w pliku checkpoint. Uruchom badanie, aby wygenerować statystyki.")
     else:
@@ -181,12 +205,51 @@ with tab_results:
 with tab_latex:
     st.subheader("Gotowe Tabele LaTeX do Wklejenia w Pracy Inżynierskiej")
     reports_dir = BASE_DIR / "results" / "reports"
-    tabela_wynikow = reports_dir / "tabela_wynikow.tex"
-    tabela_kategorii = reports_dir / "tabela_kategorii.tex"
-    tabela_statystyk = reports_dir / "tabela_statystyk.tex"
 
-    if tabela_wynikow.exists():
-        with open(tabela_wynikow, "r", encoding="utf-8") as f:
-            st.code(f.read(), language="latex")
-    else:
-        st.info("Tabele LaTeX zostaną wygenerowane automatycznie po zakończeniu badania (`python main.py run` lub `python main.py report`).")
+    subtab1, subtab2, subtab3, subtab4, subtab5 = st.tabs([
+        "1. Tabela Wyników Szczegółowych",
+        "2. Tabela Kategorii",
+        "3. Tabela Trudności",
+        "4. Tabela Statystyk Hipotez",
+        "5. Tabela Ewolucji Debaty"
+    ])
+
+    with subtab1:
+        fpath = reports_dir / "tabela_wynikow.tex"
+        if fpath.exists():
+            with open(fpath, "r", encoding="utf-8") as f:
+                st.code(f.read(), language="latex")
+        else:
+            st.info("Plik pojawi się po pierwszym uruchomieniu badania.")
+
+    with subtab2:
+        fpath = reports_dir / "tabela_kategorii.tex"
+        if fpath.exists():
+            with open(fpath, "r", encoding="utf-8") as f:
+                st.code(f.read(), language="latex")
+        else:
+            st.info("Plik pojawi się po pierwszym uruchomieniu badania.")
+
+    with subtab3:
+        fpath = reports_dir / "tabela_trudnosci.tex"
+        if fpath.exists():
+            with open(fpath, "r", encoding="utf-8") as f:
+                st.code(f.read(), language="latex")
+        else:
+            st.info("Plik pojawi się po pierwszym uruchomieniu badania.")
+
+    with subtab4:
+        fpath = reports_dir / "tabela_statystyk.tex"
+        if fpath.exists():
+            with open(fpath, "r", encoding="utf-8") as f:
+                st.code(f.read(), language="latex")
+        else:
+            st.info("Plik pojawi się po pierwszym uruchomieniu badania.")
+
+    with subtab5:
+        fpath = reports_dir / "tabela_ewolucji_debaty.tex"
+        if fpath.exists():
+            with open(fpath, "r", encoding="utf-8") as f:
+                st.code(f.read(), language="latex")
+        else:
+            st.info("Plik pojawi się po pierwszym uruchomieniu badania.")
