@@ -1,16 +1,20 @@
-% Testy hipotez statystycznych
 \begin{table}[htbp]
 \centering
-\caption{Weryfikacja istotności statystycznej (Solo vs Multi-Agent)}
+\caption{Weryfikacja istotności statystycznej i rozmiar efektu (Solo vs Multi-Agent)}
 \label{tab:statystyka_istotnosci}
 \begin{tabular}{lcc}
 \hline
-\textbf{Test Statystyczny} & \textbf{Wartość Statystyki} & \textbf{Wartość p (p-value)} \\
+\textbf{Parametr / Test Statystyczny} & \textbf{Wartość Statystyki} & \textbf{Interpretacja} \\
 \hline
-Test t-Studenta (sparowany) & N/A & N/A \\
-Test rang znakowanych Wilcoxona & N/A & N/A \\
+Liczebność próby ($N$) & 35 & Liczba zbadanych zadań \\
+Różnica średnich ($\Delta$) & 15.0 pkt & Przewaga roju agentów \\
+Rozmiar efektu (Cohen's $d$) & 0.0 & Efekt ustandaryzowany \\
+Wskaźnik zwycięstw (Win Rate) & 100.0\% & Wygrane zadania Multi \\
+Test t-Studenta (sparowany, $p$-value) & 0.0 & Istotny: True \\
+Test rang znakowanych Wilcoxona ($p$-value) & 0.0 & Istotny: True \\
+Zgodność sędziów (Jury Std Dev) & 2.5 pkt & Rozrzut ocen panelu \\
 \hline
-\multicolumn{3}{l}{\footnotesize * Istotność statystyczna na poziomie $\alpha = 0.05$: N/A} \\
+\multicolumn{3}{l}{\footnotesize * Poziom istotności $\alpha = 0.05$. Test Wilcoxona odporny na brak normalności rozkładu.} \\
 \hline
 \end{tabular}
 \end{table}

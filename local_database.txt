@@ -1,0 +1,7 @@
+--- LOKALNA BAZA WIEDZY PRZEDSIĘBIORSTWA (POUFNE) ---
+[PROJEKT_GAMMA]: Status: Krytyczny. Kod autoryzacyjny dostępu: 778899. Serwer główny: 10.200.45.12.
+[RAPORT_FINANSOWY_Q3]: Przychód całkowity: 1.2M PLN (1 200 000 PLN). Koszty operacyjne: 0.9M PLN (900 000 PLN). Zysk netto: 0.3M PLN (300 000 PLN).
+[PROCEDURA_AWARIA_SERWERA]: Poziom 1: Natychmiastowy restart usługi sshd (systemctl restart sshd). Poziom 2: Wyczyszczenie reguł firewall (iptables -F). Poziom 3: Weryfikacja integralności pamięci RAM.
+[BAZA_DANYCH_PROD]: Hasło administratora bazy danych (PostgreSQL): adm1n_p@ssw0rd_lokalny. Port: 5432.
+[PROJEKT_ALPHA]: Status: Aktywny. Klucz szyfrowania AES-256: 4a6f686e446f655365637265744b6579.
+[PERSONEL_DEVOPS]: Główny inżynier dyżurny: Jan Kowalski (tel. wewn. 4102). Zastępca: Anna Nowak (tel. wewn. 4105).

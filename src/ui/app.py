@@ -181,6 +181,14 @@ with tab_results:
             col_s4.metric("Multi Win Rate", f"{stats.get('multi_win_rate', 0)}%")
             col_s5.metric("Wilcoxon p-value", f"{stats.get('wilcoxon_pvalue', 'N/A')}")
 
+            self_corr = stats.get("self_correction", {})
+            evol = stats.get("evolution", {})
+            col_s6, col_s7, col_s8, col_s9 = st.columns(4)
+            col_s6.metric("Zgodność Sędziów (Kendall W)", f"{stats.get('kendalls_w', 'N/A')}")
+            col_s7.metric("Samo-Korekta w Debacie", f"{self_corr.get('self_correction_rate', 0)}%")
+            col_s8.metric("Degradacja (Derailment)", f"{self_corr.get('derailment_rate', 0)}%")
+            col_s9.metric("Zysk z Debaty (Finał - T5)", f"{evol.get('debate_gain', 0):+.1f} pkt")
+
             st.markdown("---")
             st.subheader("Wykresy do Pracy Inżynierskiej")
             fig_dir = BASE_DIR / "results" / "figures"
@@ -190,13 +198,17 @@ with tab_results:
             with c_fig1:
                 if (fig_dir / "dashboard_porownawczy.png").exists():
                     st.image(str(fig_dir / "dashboard_porownawczy.png"), caption="Podsumowanie Ogólne", use_container_width=True)
-                if (fig_dir / "trudnosc_skalowanie.png").exists():
-                    st.image(str(fig_dir / "trudnosc_skalowanie.png"), caption="Skalowanie wg Poziomu Trudności", use_container_width=True)
-            with c_fig2:
                 if (fig_dir / "kategorie_porownanie.png").exists():
                     st.image(str(fig_dir / "kategorie_porownanie.png"), caption="Skuteczność wg Kategorii", use_container_width=True)
                 if (fig_dir / "ewolucja_tur.png").exists():
                     st.image(str(fig_dir / "ewolucja_tur.png"), caption="Progres Jakości w Turach", use_container_width=True)
+            with c_fig2:
+                if (fig_dir / "radar_kompetencji.png").exists():
+                    st.image(str(fig_dir / "radar_kompetencji.png"), caption="Profil Radarowy Kompetencji", use_container_width=True)
+                if (fig_dir / "trudnosc_skalowanie.png").exists():
+                    st.image(str(fig_dir / "trudnosc_skalowanie.png"), caption="Skalowanie wg Poziomu Trudności", use_container_width=True)
+                if (fig_dir / "pareto_koszt_wynik.png").exists():
+                    st.image(str(fig_dir / "pareto_koszt_wynik.png"), caption="Analiza Koszt-Efekt (Pareto)", use_container_width=True)
         else:
             st.warning("Brak zapisanych wyników w pliku checkpoint. Uruchom badanie, aby wygenerować statystyki.")
     else:

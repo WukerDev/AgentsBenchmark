@@ -29,8 +29,8 @@ results/logs/*.html
 results/figures/*.png
 results/figures/*.svg
 results/reports/*.tex
+results/reports/*.md
 results/badanie_groupchat_wyniki.xlsx
-local_database.txt
 
 # OS generated
 .DS_Store

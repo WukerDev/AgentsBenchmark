@@ -4,6 +4,7 @@ from typing import Tuple, List, Dict, Any
 from src.tools.code_executor import execute_python_code
 from src.tools.web_search import search_web
 from src.tools.local_docs import search_local_docs
+from src.tools.calculator import evaluate_math_expression
 from src.config import config
 
 class ToolResult:
@@ -18,6 +19,7 @@ def process_tools_in_response(response_text: str) -> Tuple[str, float, List[Tool
     combined_output = ""
     results: List[ToolResult] = []
 
+    # 1. Python Code Blocks
     code_matches = re.findall(r"```python(.*?)```", response_text, re.DOTALL)
     for code in code_matches:
         code_str = code.strip()
@@ -27,6 +29,17 @@ def process_tools_in_response(response_text: str) -> Tuple[str, float, List[Tool
             results.append(ToolResult("python", code_str, out, t))
             combined_output += f"\n[SYSTEM: Wynik wykonania kodu Python]:\n{out}\n"
 
+    # 2. Fast Symbolic Math & Calculator: CALC: <expression>
+    calc_matches = re.findall(r"^CALC:\s*(.+)$", response_text, re.MULTILINE)
+    for expr in calc_matches:
+        expr_str = expr.strip()
+        if expr_str:
+            out, t = evaluate_math_expression(expr_str)
+            total_time += t
+            results.append(ToolResult("calc", expr_str, out, t))
+            combined_output += f"\n[SYSTEM: Wynik kalkulatora matematycznego]:\n{out}\n"
+
+    # 3. Web Search: SEARCH: <query>
     search_matches = re.findall(r"^SEARCH:\s*(.+)$", response_text, re.MULTILINE)
     for q in search_matches:
         q_str = q.strip()
@@ -36,6 +49,7 @@ def process_tools_in_response(response_text: str) -> Tuple[str, float, List[Tool
             results.append(ToolResult("web_search", q_str, out, t))
             combined_output += f"\n[SYSTEM: Wyniki wyszukiwania w sieci dla '{q_str}']:\n{out}\n"
 
+    # 4. Local Enterprise Docs: LOCAL_DOC: <query>
     doc_matches = re.findall(r"^LOCAL_DOC:\s*(.+)$", response_text, re.MULTILINE)
     for q in doc_matches:
         q_str = q.strip()

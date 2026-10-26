@@ -9,9 +9,10 @@ SOLO_SYSTEM_PROMPT = """Jesteś zaawansowanym asystentem AI rozwiązującym zło
 Masz dostęp do następujących narzędzi. Używaj ich pisząc dokładnie w nowej linii:
 1. SEARCH: zapytanie (Szuka informacji w internecie)
 2. LOCAL_DOC: zapytanie (Szuka w bezpiecznej lokalnej bazie danych firmy)
-3. ```python
+3. CALC: wyrażenie_matematyczne (Bezpieczny, precyzyjny kalkulator symboliczny np. CALC: 2**32 / 1024)
+4. ```python
 print(2+2)
-``` (Wykonuje kod Python. ZAWSZE używaj print() aby zobaczyć wynik).
+``` (Wykonuje kod Python w izolowanym środowisku. ZAWSZE używaj print() aby zobaczyć wynik).
 
 Po użyciu narzędzia, system zwróci Ci wynik. Przeanalizuj go i kontynuuj rozumowanie.
 Gdy osiągniesz ostateczną, zweryfikowaną odpowiedź, zakończ wypowiedź słowami 'ZATWIERDZAM WYNIK' i podaj ostateczną konkluzję."""
@@ -34,7 +35,7 @@ class SoloAgentRunner:
         total_cost = 0.0
         turn_count = 0
         final_answer = ""
-        tool_counts: Dict[str, int] = {"python": 0, "web_search": 0, "local_docs": 0}
+        tool_counts: Dict[str, int] = {"python": 0, "calculator": 0, "web_search": 0, "local_docs": 0}
         tool_error_count = 0
         max_turns = config.execution.max_solo_turns
 
@@ -42,7 +43,7 @@ class SoloAgentRunner:
             turn_count += 1
             agent_input = (
                 f"{chat_history}\n\n"
-                "[Oczekuję na Twoją analizę i użycie narzędzi (SEARCH, LOCAL_DOC, python), "
+                "[Oczekuję na Twoją analizę i użycie narzędzi (CALC, SEARCH, LOCAL_DOC, python), "
                 "lub słowa 'ZATWIERDZAM WYNIK' jeśli znasz ostateczną odpowiedź]"
             )
 
@@ -80,14 +81,13 @@ class SoloAgentRunner:
 
         return {
             "final_answer": final_answer,
+            "turns": turn_count,
             "generation_time": round(total_gen_time, 2),
             "tool_time": round(total_tool_time, 2),
             "total_time": round(total_gen_time + total_tool_time, 2),
             "tokens": total_tokens,
             "cost": round(total_cost, 4),
-            "turns": turn_count,
             "tool_counts": tool_counts,
             "tool_error_count": tool_error_count,
-            "chat_history": chat_history,
-            "model": self.model
+            "chat_history": chat_history
         }

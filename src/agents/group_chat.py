@@ -73,7 +73,11 @@ Dostępni agenci do wyboru: {available}.
 ZASADY PRZEPŁYWU:
 - Po 'analyst' lub 'archivist' -> 'solver' lub 'coder'.
 - Po 'coder' -> 'qa_engineer'.
-- Po 'qa_engineer' -> 'solver' (jeśli kod ok) lub 'coder' (jeśli błąd).
+- Po 'qa_engineer' (jeśli kod dotyczy bezpieczeństwa / kryptografii) -> 'security_auditor'.
+- Po 'qa_engineer' (jeśli kod dotyczy praw fizyki / zdrowego rozsądku) -> 'fact_checker'.
+- Po 'qa_engineer' (jeśli kod ok) -> 'solver'.
+- Po 'qa_engineer' (jeśli błąd) -> 'coder'.
+- Po 'security_auditor' lub 'fact_checker' -> 'solver'.
 - Po 'solver' -> 'critic' lub 'devil'.
 - Po 'devil' -> 'solver' lub 'coder'.
 - Po 'critic' -> 'secretary' (jeśli zatwierdzono) lub 'solver' (jeśli znaleziono luki).
@@ -105,6 +109,8 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
                 "archivist": "solver",
                 "coder": "qa_engineer",
                 "qa_engineer": "solver",
+                "security_auditor": "solver",
+                "fact_checker": "solver",
                 "solver": "critic",
                 "devil": "solver",
                 "critic": "secretary"
@@ -128,7 +134,7 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
         last_speaker = "none"
         agent_path: List[str] = []
         role_counts: Dict[str, int] = {}
-        tool_counts: Dict[str, int] = {"python": 0, "web_search": 0, "local_docs": 0}
+        tool_counts: Dict[str, int] = {"python": 0, "calculator": 0, "web_search": 0, "local_docs": 0}
         tool_error_count = 0
         snapshot_5 = ""
         snapshot_10 = ""
@@ -164,7 +170,7 @@ Odpowiedz DOKŁADNIE jednym słowem będącym ID agenta:
                 f"ZADANIE: {task_query}\n\n"
                 f"OSTATNIE WYDARZENIA W HISTORII:\n{recent_history}\n\n"
                 f"Jesteś agentem: {cur_agent_cfg.role} ({cur_agent_cfg.id}).\n"
-                f"Użyj narzędzia jeśli potrzebujesz (SEARCH: zapytanie, LOCAL_DOC: zapytanie, ```python...```)."
+                f"Użyj narzędzia jeśli potrzebujesz (CALC: wyrażenie, SEARCH: zapytanie, LOCAL_DOC: zapytanie, ```python...```)."
             )
 
             agent_res = self.client.generate(

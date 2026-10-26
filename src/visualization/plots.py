@@ -28,6 +28,7 @@ class BenchmarkVisualizer:
         cls.plot_difficulty_scaling(df, output_dir / "trudnosc_skalowanie.png")
         cls.plot_turn_evolution(df, output_dir / "ewolucja_tur.png")
         cls.plot_pareto_cost_score(df, output_dir / "pareto_koszt_wynik.png")
+        cls.plot_radar_competencies(df, output_dir / "radar_kompetencji.png")
 
         if show:
             plt.show()
@@ -179,6 +180,53 @@ class BenchmarkVisualizer:
         ax.set_xlabel("Koszt Wykonania Zadania (USD)")
         ax.set_ylabel("Wynik Punktowy (0-100)")
         ax.legend()
+
+        plt.tight_layout()
+        fig.savefig(save_path, dpi=300)
+        plt.close(fig)
+
+    @classmethod
+    def plot_radar_competencies(cls, df: pd.DataFrame, save_path: Path):
+        if "category" not in df or df.empty:
+            return
+
+        cat_grouped = df.groupby("category")[["score_solo", "score_multi_final"]].mean().reset_index()
+        categories = list(cat_grouped["category"])
+        N = len(categories)
+        if N < 3:
+            return
+
+        angles = [n / float(N) * 2 * np.pi for n in range(N)]
+        angles += angles[:1]
+
+        solo_vals = cat_grouped["score_solo"].tolist()
+        solo_vals += solo_vals[:1]
+
+        multi_vals = cat_grouped["score_multi_final"].tolist()
+        multi_vals += multi_vals[:1]
+
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+
+        labels = [c.replace("_", " ").title() for c in categories]
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels, fontsize=9)
+
+        ax.set_rlabel_position(0)
+        ax.set_ylim(0, 100)
+        ax.set_yticks([20, 40, 60, 80, 100])
+        ax.set_yticklabels(["20", "40", "60", "80", "100"], color="grey", size=8)
+
+        ax.plot(angles, solo_vals, linewidth=2, linestyle='solid', label="Solo ReAct", color="#718096")
+        ax.fill(angles, solo_vals, '#718096', alpha=0.15)
+
+        ax.plot(angles, multi_vals, linewidth=2, linestyle='solid', label="Multi-Agent Swarm", color="#38A169")
+        ax.fill(angles, multi_vals, '#38A169', alpha=0.25)
+
+        ax.set_title("Wykres Radarowy Kompetencji: Solo ReAct vs Multi-Agent Swarm", y=1.08, fontsize=13, fontweight="bold")
+        ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1))
 
         plt.tight_layout()
         fig.savefig(save_path, dpi=300)

@@ -13,6 +13,7 @@ from src.evaluation.statistics import compute_benchmark_statistics
 from src.storage.checkpoint import CheckpointManager
 from src.storage.excel_exporter import ExcelBenchmarkExporter
 from src.storage.latex_exporter import LatexExporter
+from src.storage.thesis_chapter_generator import ThesisChapterGenerator
 from src.visualization.plots import BenchmarkVisualizer
 
 app = typer.Typer(
@@ -100,3 +101,27 @@ def plot(show: bool = typer.Option(False, "--show", help="Wyświetl okna wykres�
     figures_dir = BASE_DIR / "results" / "figures"
     BenchmarkVisualizer.generate_all_plots(df, figures_dir, show=show)
     console.print(f"[bold green][OK] Wygenerowano wykresy w:[/bold green] {figures_dir}")
+
+@app.command("draft-chapter")
+def draft_chapter():
+    """
+    Generuje gotowy szkic Rozdziału 5 Pracy Inżynierskiej (Dyskusja i Wnioski) w Markdown i LaTeX na podstawie wyników.
+    """
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    if not chk_path.exists():
+        console.print(f"[bold red]Błąd:[/bold red] Plik checkpointu {chk_path} nie istnieje!")
+        raise typer.Exit(code=1)
+
+    chk_mgr = CheckpointManager(chk_path)
+    records = list(chk_mgr.load_completed_tasks().values())
+    if not records:
+        console.print("[yellow]Brak rekordów do wygenerowania rozdziału.[/yellow]")
+        return
+
+    df = pd.DataFrame(records)
+    stats = compute_benchmark_statistics(df)
+    reports_dir = BASE_DIR / "results" / "reports"
+
+    md_path, tex_path = ThesisChapterGenerator.generate(reports_dir, df, stats)
+    console.print(f"[bold green][OK] Wygenerowano szkic rozdziału Markdown:[/bold green] {md_path}")
+    console.print(f"[bold green][OK] Wygenerowano szkic rozdziału LaTeX:[/bold green] {tex_path}")
