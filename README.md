@@ -159,10 +159,3 @@ AiAgentsTaskSolvingBenchmark/
 
 ---
 
-## 🎓 Wartość dla Pracy Inżynierskiej
-
-Wygenerowane pliki w `results/` zawierają wszystkie elementy niezbędne do rozdziału badawczego:
-1. **`results/reports/tabela_wynikow.tex`** – pełne zestawienie wyników dla 26 zadań.
-2. **`results/reports/tabela_kategorii.tex`** – porównanie mocnych stron architektury wg dziedzin.
-3. **`results/reports/tabela_statystyk.tex`** – naukowe potwierdzenie istotności różnic (wartość *p* w teście Wilcoxona).
-4. **`results/figures/*.png`** – wykresy słupkowe, krzywe ewolucji i analiza Pareto gotowe do wstawienia do pracy.
