@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "puppeteer-core": "^24.43.1",
     "vite": "^6.0.7",
     "vite-plugin-vuetify": "^2.0.4"
   }

@@ -5,11 +5,14 @@ import numpy as np
 from scipy import stats
 
 def compute_cohens_d(x: np.ndarray, y: np.ndarray) -> float:
+    if len(x) <= 1:
+        return 0.0
     diff = x - y
     std_diff = np.std(diff, ddof=1)
-    if std_diff == 0:
+    if np.isnan(std_diff) or std_diff == 0:
         return 0.0
-    return float(np.mean(diff) / std_diff)
+    val = float(np.mean(diff) / std_diff)
+    return round(val, 3) if not np.isnan(val) else 0.0
 
 def compute_kendalls_w(rating_matrix: np.ndarray) -> Tuple[float, float, float]:
     m, n = rating_matrix.shape

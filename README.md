@@ -4,6 +4,52 @@
 
 ---
 
+## 📸 Prezentacja Interfejsu Graficznego (Dashboard GUI Preview)
+
+Projekt został wyposażony w nowoczesny interfejs graficzny Single Page Application (Vue 3 + Vuetify 3), umożliwiający pełną kontrolę nad procesem badawczym, analizę heurystyk roju agentów oraz natychmiastowy podgląd generowanych materiałów do pracy inżynierskiej.
+
+### 1. Centrum Sterowania (Control Center)
+Główny panel badawczy z syntetycznymi kartami KPI (postęp badania, średnia punktacja Solo vs Swarm, wyliczenia istotności statystycznej Wilcoxona), parametrami wykonania badania masowego oraz konsolą zdarzeń live terminal stream.
+
+![Centrum Sterowania - Dashboard](docs/screenshots/01_dashboard_control_center.png)
+
+---
+
+### 2. Laboratorium Zadania & Podgląd Debaty Roje (Task Lab & Swarm Debate)
+Moduł interaktywnego uruchamiania pojedynczych zadań eksperymentalnych: porównanie odpowiedzi pojedynczego agenta ReAct z pełną wieloturową debatą roju agentów kognitywnych (kolejne tury, dedykowane role, wywołania kodu Python i narzędzi) oraz werdyktem 3-modelowego panelu sędziowskiego LLM Jury.
+
+![Laboratorium Zadania & Debata Swarm](docs/screenshots/02_task_lab_debate.png)
+
+---
+
+### 3. Konfiguracja Agentów i Modeli LLM (Agents & Models Matrix)
+Wizualna matryca 10 wyspecjalizowanych ról kognitywnych (m.in. *Discussion Manager*, *Information Analyst*, *Local Data Archivist*, *Python Developer*, *QA Engineer*, *Security Auditor*, *Scientific Fact-Checker*, *Chief Logician*, *Devil's Advocate*, *Secretary*) z możliwością modyfikacji modeli Ollama oraz promptów systemowych w czasie rzeczywistym.
+
+![Konfiguracja Agentów i Modeli](docs/screenshots/03_agents_configuration.png)
+
+---
+
+### 4. Wyniki Pomiarów & Wykresy Publikacyjne (300 DPI)
+Kompletna tabela pomiarowa zarejestrowanych zadań z checkpointu (dokładne wyniki punktowe, zysk z debaty, czasy wykonania, koszty USD) wraz z interaktywną galerią wykresów naukowych generowanych przez Seaborn i Matplotlib.
+
+![Wyniki i Wykresy Publikacyjne](docs/screenshots/04_results_and_charts.png)
+
+---
+
+### 5. Automatyczny Szkic Rozdziału 5 & Tabele LaTeX
+Bezpośredni podgląd wygenerowanego tekstu Rozdziału 5 pracy inżynierskiej (*Dyskusja Wyników i Wnioski*), zawierającego gotowe tabele LaTeX, interpretację statystyczną (Wilcoxon, t-Student, wielkość efektu d Cohena, zgodność Kendalla W) oraz podsumowanie hipotez badawczych.
+
+![Rozdział 5 i Eksport LaTeX](docs/screenshots/05_thesis_chapter_draft.png)
+
+---
+
+### 6. Personalizacja Wizualna (Tryb Ciemny / Jasny)
+Wbudowany przełącznik motywu z pełnym wsparciem dla trybu ciemnego (Dark Theme) oraz jasnego (Light Theme).
+
+![Tryb Jasny Dashboardu](docs/screenshots/06_dashboard_light_theme.png)
+
+---
+
 ## 📌 Główne Cechy & Architektura v2.1
 
 - **Nowoczesny Dashboard Vue 3 + Vuetify 3 (GUI)**:
@@ -114,6 +160,8 @@ python main.py plot
 
 ```text
 AiAgentsTaskSolvingBenchmark/
+├── docs/
+│   └── screenshots/                # Zrzuty ekranu interfejsu (Centrum Sterowania, Debata, Modele, Wykresy)
 ├── frontend/                       # Kompletny frontend Vue 3 + Vuetify 3
 │   ├── src/
 │   │   ├── plugins/vuetify.js      # Konfiguracja motywów (Dark/Light) i komponentów

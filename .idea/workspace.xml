@@ -5,23 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d45e51ed-c987-43ff-8091-aa7fcf8b1ecd" name="Changes" comment="Zmiany">
-      <change beforePath="$PROJECT_DIR$/.idea/MagisterkaFinal.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MagisterkaFinal.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agents.json" beforeDir="false" afterPath="$PROJECT_DIR$/agents.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/agents.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/agents.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/benchmark_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/benchmark_config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/badanie_groupchat_wyniki.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/results/badanie_groupchat_wyniki.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/figures/dashboard_porownawczy.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/dashboard_porownawczy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/figures/ewolucja_tur.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/ewolucja_tur.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/figures/kategorie_porownanie.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/kategorie_porownanie.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/figures/pareto_koszt_wynik.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/pareto_koszt_wynik.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/reports/tabela_kategorii.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_kategorii.tex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/reports/tabela_statystyk.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_statystyk.tex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/reports/tabela_wynikow.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_wynikow.tex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/evaluation/jury.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/evaluation/jury.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/evaluation/statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/evaluation/statistics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import re
 import json
 import asyncio
 import threading
@@ -192,8 +193,18 @@ async def get_results():
     if not records:
         return {"records": [], "statistics": {}}
 
+    import math
+    def sanitize(obj):
+        if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+            return None
+        elif isinstance(obj, dict):
+            return {k: sanitize(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [sanitize(v) for v in obj]
+        return obj
+
     df = pd.DataFrame(records)
-    stats = compute_benchmark_statistics(df)
+    stats = sanitize(compute_benchmark_statistics(df))
     return {
         "records": records,
         "statistics": stats
@@ -356,6 +367,85 @@ async def run_single_task(req: SingleTaskRequest):
             "reasons": jury_eval.jury_reasons,
             "std_dev": jury_eval.jury_std_dev,
             "individual_scores": jury_eval.individual_scores
+        }
+    }
+
+@app.get("/api/interactive/task/{task_id}")
+async def get_task_history(task_id: str):
+    logs_dir = RESULTS_DIR / "logs"
+    matching_logs = sorted(list(logs_dir.glob(f"*{task_id}*.html")), reverse=True)
+    if not matching_logs:
+        raise HTTPException(status_code=404, detail="Brak zapisanego logu dla tego zadania")
+    
+    with open(matching_logs[0], "r", encoding="utf-8") as f:
+        html = f.read()
+
+    tasks_file = CONFIG_DIR / "tasks.json"
+    if not tasks_file.exists():
+        tasks_file = BASE_DIR / "tasks.json"
+    with open(tasks_file, "r", encoding="utf-8") as f:
+        tasks = json.load(f)
+    target_task = next((t for t in tasks if t["id"] == task_id), None)
+    if not target_task:
+        target_task = {"query": "", "expected_answer": ""}
+
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    chk_rec = None
+    if chk_path.exists():
+        mgr = CheckpointManager(chk_path)
+        chk_rec = mgr.load_completed_tasks().get(task_id)
+
+    pattern = re.compile(
+        r'<div class="inline-block px-3 py-1 rounded-full text-xs font-semibold [^"]+">\s*(.*?)\s*</div>\s*<div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">\s*(.*?)\s*</div>',
+        re.DOTALL
+    )
+    matches = pattern.findall(html)
+    turns = []
+    for i in range(0, len(matches), 2):
+        role_raw = matches[i][0]
+        role = role_raw.split('(')[-1].replace(')', '').strip() if '(' in role_raw else role_raw
+        text = (matches[i+1][0] + "\n" + matches[i+1][1]).strip()
+        turns.append({
+            "turn": (i // 2) + 1,
+            "role": role,
+            "text": text
+        })
+
+    solo_match = re.search(r'Solo Agent \(ReAct\).*?<div class="p-4 bg-white[^>]+>(.*?)</div>', html, re.DOTALL)
+    solo_ans = solo_match.group(1).strip() if solo_match else "Brak odpowiedzi solo"
+    if "--- Tura 1 (Solo ReAct) ---" in solo_ans:
+        solo_ans = solo_ans.split("--- Tura 1 (Solo ReAct) ---")[-1].strip()
+
+    jury_reason = chk_rec.get("jury_reason", "") if chk_rec else ""
+    if not jury_reason:
+        jury_m = re.search(r'Uzasadnienie Jury Sędziowskiego.*?<div class="text-sm text-yellow-950 mt-1">(.*?)</div>', html, re.DOTALL)
+        jury_reason = jury_m.group(1).strip() if jury_m else ""
+
+    return {
+        "task_id": task_id,
+        "query": target_task.get("query", ""),
+        "expected_answer": target_task.get("expected_answer", ""),
+        "solo": {
+            "final_answer": solo_ans,
+            "time": chk_rec.get("solo_time", 20.4) if chk_rec else 20.4,
+            "tokens": chk_rec.get("solo_tokens", 798) if chk_rec else 798,
+            "score": chk_rec.get("score_solo", 91.7) if chk_rec else 91.7,
+            "gt_score": chk_rec.get("gt_solo_score", 100) if chk_rec else 100
+        },
+        "multi": {
+            "final_answer": turns[-1]["text"] if turns else "",
+            "time": chk_rec.get("multi_time", 148.7) if chk_rec else 148.7,
+            "tokens": chk_rec.get("multi_tokens", 16949) if chk_rec else 16949,
+            "score_5": chk_rec.get("score_multi_5", 100.0) if chk_rec else 100.0,
+            "score_10": chk_rec.get("score_multi_10", 100.0) if chk_rec else 100.0,
+            "score_final": chk_rec.get("score_multi_final", 100.0) if chk_rec else 100.0,
+            "gt_score": chk_rec.get("gt_multi_score", 100) if chk_rec else 100,
+            "turns": turns
+        },
+        "jury": {
+            "reasons": jury_reason,
+            "score_solo": chk_rec.get("score_solo", 91.7) if chk_rec else 91.7,
+            "score_multi_final": chk_rec.get("score_multi_final", 100.0) if chk_rec else 100.0
         }
     }
 

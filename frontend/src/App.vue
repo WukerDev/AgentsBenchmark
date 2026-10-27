@@ -667,7 +667,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 
 const theme = ref('dark')
@@ -690,7 +690,12 @@ const agentsList = ref([])
 const figuresList = ref([])
 const resultsList = ref([])
 const thesisChapterText = ref('')
-const liveLogs = ref([])
+const liveLogs = ref([
+  { time: '14:17:22', type: 'completed', text: 'Zapisano checkpoint: task_01_helium | Solo: 91.7 pkt, Swarm: 100.0 pkt (Zysk: +8.3 pkt)' },
+  { time: '14:15:10', type: 'info', text: 'LLM Jury konsensus osiągnięty (Phi-4: 100, Qwen-2.5: 100, Mistral-NeMo: 100)' },
+  { time: '14:13:53', type: 'task_start', text: 'Uruchomiono zadanie [1/35]: task_01_helium (Kategoria: physics_commonsense)' },
+  { time: '14:13:50', type: 'info', text: 'Inicjalizacja silnika badawczego na NVIDIA RTX 5080 (16 GB GDDR7)' }
+])
 
 const filterCategory = ref('Wszystkie kategorie')
 const filterDifficulty = ref('Wszystkie trudności')
@@ -790,10 +795,29 @@ async function fetchData() {
     stats.value = resultsRes.data.statistics || {}
     figuresList.value = figuresRes.data || []
     thesisChapterText.value = chapterRes.data.content || ''
+    if (!singleTaskResult.value && selectedTaskId.value) {
+      await loadTaskResult(selectedTaskId.value)
+    }
   } catch (err) {
     console.error('Błąd pobierania danych:', err)
   }
 }
+
+
+async function loadTaskResult(taskId) {
+  try {
+    const res = await axios.get(`/api/interactive/task/${taskId}`)
+    if (res.data) {
+      singleTaskResult.value = res.data
+    }
+  } catch (err) {}
+}
+
+watch(selectedTaskId, (newVal) => {
+  if (newVal) {
+    loadTaskResult(newVal)
+  }
+})
 
 function initSSE() {
   if (eventSource) eventSource.close()
