@@ -35,3 +35,5 @@ results/badanie_groupchat_wyniki.xlsx
 # OS generated
 .DS_Store
 Thumbs.db
+/frontend/dist/
+/frontend/node_modules/

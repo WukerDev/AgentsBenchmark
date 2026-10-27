@@ -1,0 +1,419 @@
+from __future__ import annotations
+import os
+import json
+import asyncio
+import threading
+import httpx
+from pathlib import Path
+from typing import Dict, Any, List, Optional
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+import pandas as pd
+import yaml
+
+from src.config import config, BASE_DIR, CONFIG_DIR, RESULTS_DIR
+from src.runner import BenchmarkRunner
+from src.agents.solo_agent import SoloAgentRunner
+from src.agents.group_chat import MultiAgentSwarmRunner, load_agents_config
+from src.evaluation.ground_truth import GroundTruthVerifier
+from src.evaluation.jury import LLMJury
+from src.evaluation.statistics import compute_benchmark_statistics
+from src.storage.checkpoint import CheckpointManager
+from src.storage.excel_exporter import ExcelBenchmarkExporter
+from src.storage.latex_exporter import LatexExporter
+from src.storage.thesis_chapter_generator import ThesisChapterGenerator
+from src.visualization.plots import BenchmarkVisualizer
+
+app = FastAPI(
+    title="AiAgents Task Solving Benchmark API",
+    description="Backend API i Dashboard dla Pracy Inżynierskiej",
+    version="2.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Global State for Benchmark Runner
+class BenchmarkState:
+    def __init__(self):
+        self.is_running: bool = False
+        self.current_task_id: Optional[str] = None
+        self.current_step: str = "Bezczynny"
+        self.progress_percent: float = 0.0
+        self.completed_count: int = 0
+        self.total_count: int = 35
+        self.runner: Optional[BenchmarkRunner] = None
+        self.event_subscribers: List[asyncio.Queue] = []
+        self.logs_buffer: List[Dict[str, Any]] = []
+
+    def broadcast(self, event_type: str, data: Dict[str, Any]):
+        message = {"type": event_type, "data": data}
+        self.logs_buffer.append(message)
+        if len(self.logs_buffer) > 200:
+            self.logs_buffer.pop(0)
+
+        for q in list(self.event_subscribers):
+            try:
+                q.put_nowait(message)
+            except Exception:
+                pass
+
+benchmark_state = BenchmarkState()
+
+class StartBenchmarkRequest(BaseModel):
+    provider: Optional[str] = "ollama"
+    category: Optional[str] = None
+    difficulty: Optional[str] = None
+    tasks: Optional[List[str]] = None
+    resume: bool = True
+    dry_run: bool = False
+
+class SingleTaskRequest(BaseModel):
+    task_id: str
+    provider: Optional[str] = "ollama"
+
+# ----------------- ENDPOINTS -----------------
+
+@app.get("/api/status")
+async def get_status():
+    ollama_online = False
+    ollama_models = []
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.get(f"{config.providers.ollama.base_url.replace('/v1', '')}/api/tags")
+            if resp.status_code == 200:
+                ollama_online = True
+                data = resp.json()
+                ollama_models = [m["name"] for m in data.get("models", [])]
+    except Exception:
+        ollama_online = False
+
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    completed_tasks = 0
+    if chk_path.exists():
+        mgr = CheckpointManager(chk_path)
+        completed_tasks = len(mgr.load_completed_tasks())
+
+    return {
+        "benchmark_running": benchmark_state.is_running,
+        "current_task": benchmark_state.current_task_id,
+        "current_step": benchmark_state.current_step,
+        "progress_percent": benchmark_state.progress_percent,
+        "completed_count": completed_tasks,
+        "total_count": 35,
+        "ollama_online": ollama_online,
+        "ollama_models": ollama_models,
+        "default_provider": config.system.default_provider,
+        "gpu_device": "NVIDIA GeForce RTX 5080 (16 GB GDDR7)"
+    }
+
+@app.get("/api/tasks")
+async def get_tasks():
+    tasks_file = CONFIG_DIR / "tasks.json"
+    if not tasks_file.exists():
+        tasks_file = BASE_DIR / "tasks.json"
+
+    with open(tasks_file, "r", encoding="utf-8") as f:
+        all_tasks = json.load(f)
+
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    completed_map = {}
+    if chk_path.exists():
+        mgr = CheckpointManager(chk_path)
+        completed_map = mgr.load_completed_tasks()
+
+    enriched_tasks = []
+    for t in all_tasks:
+        tid = t["id"]
+        result = completed_map.get(tid)
+        item = {
+            **t,
+            "completed": tid in completed_map,
+            "score_solo": result.get("score_solo") if result else None,
+            "score_multi_final": result.get("score_multi_final") if result else None,
+            "debate_gain": result.get("debate_gain") if result else None,
+            "solo_time": result.get("solo_time") if result else None,
+            "multi_time": result.get("multi_time") if result else None,
+            "cost_usd": result.get("multi_cost_usd") if result else None,
+            "agent_path": result.get("agent_path") if result else None,
+            "jury_reason": result.get("jury_reason") if result else None
+        }
+        enriched_tasks.append(item)
+
+    return enriched_tasks
+
+@app.get("/api/agents")
+async def get_agents():
+    agents_path = CONFIG_DIR / "agents.json"
+    if not agents_path.exists():
+        agents_path = BASE_DIR / "agents.json"
+    with open(agents_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+@app.put("/api/agents")
+async def save_agents(agents: List[Dict[str, Any]]):
+    p1 = CONFIG_DIR / "agents.json"
+    p2 = BASE_DIR / "agents.json"
+    with open(p1, "w", encoding="utf-8") as f:
+        json.dump(agents, f, indent=2, ensure_ascii=False)
+    with open(p2, "w", encoding="utf-8") as f:
+        json.dump(agents, f, indent=2, ensure_ascii=False)
+    return {"message": "Zaktualizowano konfigurację agentów", "count": len(agents)}
+
+@app.get("/api/config")
+async def get_benchmark_config():
+    p = CONFIG_DIR / "benchmark_config.yaml"
+    with open(p, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+@app.put("/api/config")
+async def save_benchmark_config(data: Dict[str, Any]):
+    p = CONFIG_DIR / "benchmark_config.yaml"
+    with open(p, "w", encoding="utf-8") as f:
+        yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
+    return {"message": "Zaktualizowano konfigurację benchmarku"}
+
+@app.get("/api/results")
+async def get_results():
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    if not chk_path.exists():
+        return {"records": [], "statistics": {}}
+
+    mgr = CheckpointManager(chk_path)
+    records = list(mgr.load_completed_tasks().values())
+    if not records:
+        return {"records": [], "statistics": {}}
+
+    df = pd.DataFrame(records)
+    stats = compute_benchmark_statistics(df)
+    return {
+        "records": records,
+        "statistics": stats
+    }
+
+def run_benchmark_thread(req: StartBenchmarkRequest):
+    try:
+        benchmark_state.is_running = True
+        benchmark_state.current_step = "Inicjalizacja środowiska badania..."
+        benchmark_state.broadcast("status", {"step": benchmark_state.current_step, "running": True})
+
+        runner = BenchmarkRunner(
+            provider=req.provider,
+            task_filter=req.tasks,
+            category_filter=req.category,
+            difficulty_filter=req.difficulty,
+            resume=req.resume,
+            dry_run=req.dry_run
+        )
+        benchmark_state.runner = runner
+
+        # Hook progress tracking
+        orig_tasks = runner.tasks
+        total = len(orig_tasks)
+        benchmark_state.total_count = total
+
+        for idx, task in enumerate(orig_tasks):
+            if not benchmark_state.is_running:
+                break
+            benchmark_state.current_task_id = task["id"]
+            benchmark_state.progress_percent = round((idx / total) * 100, 1)
+            benchmark_state.current_step = f"Wykonywanie zadania [{idx+1}/{total}]: {task['id']}"
+            benchmark_state.broadcast("task_start", {
+                "task_id": task["id"],
+                "index": idx + 1,
+                "total": total,
+                "category": task.get("category", "")
+            })
+
+        runner.run()
+
+        benchmark_state.current_step = "Badanie zakończone pomyślnie!"
+        benchmark_state.progress_percent = 100.0
+        benchmark_state.broadcast("completed", {"message": "Wszystkie zadania ukończone"})
+    except Exception as e:
+        benchmark_state.current_step = f"Błąd: {str(e)}"
+        benchmark_state.broadcast("error", {"error": str(e)})
+    finally:
+        benchmark_state.is_running = False
+        benchmark_state.current_task_id = None
+        benchmark_state.broadcast("status", {"step": benchmark_state.current_step, "running": False})
+
+@app.post("/api/benchmark/start")
+async def start_benchmark(req: StartBenchmarkRequest, background_tasks: BackgroundTasks):
+    if benchmark_state.is_running:
+        raise HTTPException(status_code=400, detail="Benchmark jest już w trakcie wykonywania.")
+    threading.Thread(target=run_benchmark_thread, args=(req,), daemon=True).start()
+    return {"message": "Uruchomiono benchmark w tle", "provider": req.provider}
+
+@app.post("/api/benchmark/stop")
+async def stop_benchmark():
+    if not benchmark_state.is_running:
+        return {"message": "Benchmark nie jest obecnie uruchomiony"}
+    benchmark_state.is_running = False
+    benchmark_state.current_step = "Zatrzymano przez użytkownika"
+    benchmark_state.broadcast("stopped", {"message": "Zatrzymano proces badania"})
+    return {"message": "Zatrzymano proces benchmarku"}
+
+@app.get("/api/benchmark/stream")
+async def stream_benchmark(request: Request):
+    queue: asyncio.Queue = asyncio.Queue()
+    benchmark_state.event_subscribers.append(queue)
+
+    async def event_generator():
+        try:
+            # First send current state
+            yield f"data: {json.dumps({'type': 'init', 'data': {'running': benchmark_state.is_running, 'step': benchmark_state.current_step, 'percent': benchmark_state.progress_percent, 'task': benchmark_state.current_task_id}})}\n\n"
+            while True:
+                if await request.is_disconnected():
+                    break
+                try:
+                    msg = await asyncio.wait_for(queue.get(), timeout=2.0)
+                    yield f"data: {json.dumps(msg)}\n\n"
+                except asyncio.TimeoutError:
+                    yield f": keep-alive\n\n"
+        finally:
+            if queue in benchmark_state.event_subscribers:
+                benchmark_state.event_subscribers.remove(queue)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.post("/api/interactive/run-task")
+async def run_single_task(req: SingleTaskRequest):
+    tasks_file = CONFIG_DIR / "tasks.json"
+    if not tasks_file.exists():
+        tasks_file = BASE_DIR / "tasks.json"
+
+    with open(tasks_file, "r", encoding="utf-8") as f:
+        tasks = json.load(f)
+
+    target_task = next((t for t in tasks if t["id"] == req.task_id), None)
+    if not target_task:
+        raise HTTPException(status_code=404, detail="Nie znaleziono zadania")
+
+    # Run Solo
+    solo_runner = SoloAgentRunner(provider=req.provider)
+    solo_res = solo_runner.run(target_task["query"])
+
+    # Run Swarm with turn tracking
+    debate_turns = []
+    def on_turn(turn_idx, role, response_text, tool_out):
+        debate_turns.append({
+            "turn": turn_idx,
+            "role": role,
+            "text": response_text,
+            "tool_output": tool_out
+        })
+
+    multi_runner = MultiAgentSwarmRunner(provider=req.provider)
+    group_res = multi_runner.run(target_task["query"], on_turn_callback=on_turn)
+
+    # Jury Evaluation
+    jury = LLMJury(provider=req.provider)
+    jury_eval = jury.evaluate(
+        target_task["query"],
+        target_task.get("expected_answer", ""),
+        solo_res["final_answer"],
+        group_res["snapshot_5"],
+        group_res["snapshot_10"],
+        group_res["final_answer"]
+    )
+
+    # Ground Truth
+    gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(target_task["id"], solo_res["final_answer"])
+    gt_multi_score, gt_multi_ok, gt_multi_expl = GroundTruthVerifier.verify(target_task["id"], group_res["final_answer"])
+
+    return {
+        "task_id": req.task_id,
+        "query": target_task["query"],
+        "expected_answer": target_task.get("expected_answer", ""),
+        "solo": {
+            "final_answer": solo_res["final_answer"],
+            "time": solo_res["total_time"],
+            "tokens": solo_res["tokens"],
+            "score": jury_eval.score_solo,
+            "gt_score": gt_solo_score
+        },
+        "multi": {
+            "final_answer": group_res["final_answer"],
+            "time": group_res["total_time"],
+            "tokens": group_res["tokens"],
+            "score_5": jury_eval.score_multi_5,
+            "score_10": jury_eval.score_multi_10,
+            "score_final": jury_eval.score_multi_final,
+            "gt_score": gt_multi_score,
+            "agent_path": group_res["agent_path"],
+            "turns": debate_turns
+        },
+        "jury": {
+            "reasons": jury_eval.jury_reasons,
+            "std_dev": jury_eval.jury_std_dev,
+            "individual_scores": jury_eval.individual_scores
+        }
+    }
+
+@app.post("/api/reports/generate")
+async def generate_reports():
+    chk_path = BASE_DIR / config.system.checkpoint_file
+    if not chk_path.exists():
+        raise HTTPException(status_code=400, detail="Brak pliku checkpointu results/checkpoint.jsonl")
+
+    mgr = CheckpointManager(chk_path)
+    records = list(mgr.load_completed_tasks().values())
+    if not records:
+        raise HTTPException(status_code=400, detail="Brak rekordów w pliku checkpointu")
+
+    df = pd.DataFrame(records)
+    stats = compute_benchmark_statistics(df)
+
+    excel_path = BASE_DIR / config.system.excel_output
+    reports_dir = RESULTS_DIR / "reports"
+    figures_dir = RESULTS_DIR / "figures"
+
+    ExcelBenchmarkExporter.export(excel_path, df, stats)
+    LatexExporter.export(reports_dir, df, stats)
+    BenchmarkVisualizer.generate_all_plots(df, figures_dir, show=False)
+    md_path, tex_path = ThesisChapterGenerator.generate(reports_dir, df, stats)
+
+    return {
+        "message": "Pomyślnie zaktualizowano wszystkie raporty, tabele LaTeX i wykresy",
+        "excel": str(excel_path),
+        "latex_reports": str(reports_dir),
+        "figures": str(figures_dir),
+        "chapter_md": str(md_path),
+        "chapter_tex": str(tex_path)
+    }
+
+@app.get("/api/reports/chapter")
+async def get_chapter():
+    p = RESULTS_DIR / "reports" / "rozdzial_5_dyskusja_wynikow.md"
+    if not p.exists():
+        return {"content": "Szkic rozdziału nie został jeszcze wygenerowany. Uruchom badanie i kliknij 'Generuj Raporty'."}
+    with open(p, "r", encoding="utf-8") as f:
+        return {"content": f.read()}
+
+@app.get("/api/figures")
+async def list_figures():
+    figures_dir = RESULTS_DIR / "figures"
+    if not figures_dir.exists():
+        return []
+    return [f.name for f in figures_dir.glob("*.png")]
+
+@app.get("/api/figures/{filename}")
+async def get_figure(filename: str):
+    p = RESULTS_DIR / "figures" / filename
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="Wykres nie istnieje")
+    return FileResponse(p, media_type="image/png")
+
+# Mount Vue static frontend if build exists
+frontend_dist = BASE_DIR / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")

@@ -5,52 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d45e51ed-c987-43ff-8091-aa7fcf8b1ecd" name="Changes" comment="Zmiany">
-      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/agents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/benchmark_config.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/tasks.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/badanie_groupchat_wyniki.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/figures/dashboard_porownawczy.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/figures/ewolucja_tur.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/figures/kategorie_porownanie.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/figures/pareto_koszt_wynik.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/logs/log_20261026_002339_task_01_helium.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/logs/log_20261026_002339_task_02_monty_hall_100.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/reports/tabela_kategorii.tex" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/reports/tabela_statystyk.tex" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/reports/tabela_wynikow.tex" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agents/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agents/base_agent.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agents/group_chat.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agents/solo_agent.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/evaluation/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/evaluation/ground_truth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/evaluation/jury.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/evaluation/statistics.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/llm/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/llm/client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/runner.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/storage/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/storage/checkpoint.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/storage/excel_exporter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/storage/html_reporter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/storage/latex_exporter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/code_executor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/local_docs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/registry.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/web_search.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ui/console.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/visualization/plots.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/MagisterkaFinal.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MagisterkaFinal.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents.json" beforeDir="false" afterPath="$PROJECT_DIR$/agents.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/agents.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/agents.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/benchmark_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/benchmark_config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/badanie_groupchat_wyniki.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/results/badanie_groupchat_wyniki.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/figures/dashboard_porownawczy.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/dashboard_porownawczy.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/figures/ewolucja_tur.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/ewolucja_tur.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/figures/kategorie_porownanie.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/kategorie_porownanie.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/figures/pareto_koszt_wynik.png" beforeDir="false" afterPath="$PROJECT_DIR$/results/figures/pareto_koszt_wynik.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/reports/tabela_kategorii.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_kategorii.tex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/reports/tabela_statystyk.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_statystyk.tex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/reports/tabela_wynikow.tex" beforeDir="false" afterPath="$PROJECT_DIR$/results/reports/tabela_wynikow.tex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/evaluation/jury.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/evaluation/jury.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,8 +46,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/WukerDev/AiAgentsTaskSolvingBenchmark.git&quot;,
-    &quot;accountId&quot;: &quot;0802da18-9278-4d76-a2d2-03de7b99dfdb&quot;
+    &quot;url&quot;: &quot;https://github.com/WukerDev/AgentsBenchmark.git&quot;,
+    &quot;accountId&quot;: &quot;3d1abcec-7406-4981-8006-176386349916&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -87,23 +58,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;python.packages.toolwindow.project.migrated.to.right.top.v2&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="MagisterkaFinal" />
@@ -118,7 +92,9 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -132,8 +108,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-python-sdk-73a66231627c-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.10968.92" />
       </set>
     </attachedChunks>
   </component>

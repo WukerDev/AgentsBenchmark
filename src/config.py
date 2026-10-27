@@ -56,7 +56,7 @@ class ModelsConfig(BaseModel):
         "openrouter": "meta-llama/llama-3.3-70b-instruct"
     })
     jury_models: Dict[str, List[str]] = Field(default_factory=lambda: {
-        "ollama": ["phi4", "qwen2.5:14b", "gpt-oss:20b"],
+        "ollama": ["phi4:latest", "qwen2.5:14b", "mistral-nemo:12b"],
         "groq": ["llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"],
         "openai": ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"],
         "openrouter": ["meta-llama/llama-3.3-70b-instruct", "mistralai/mixtral-8x7b-instruct", "google/gemma-2-9b-it"]

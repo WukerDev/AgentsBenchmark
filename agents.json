@@ -14,7 +14,7 @@
   {
     "id": "archivist",
     "role": "Local Data Archivist",
-    "model": "llama3.1:8b",
+    "model": "mistral-nemo:12b",
     "system_prompt": "You are the Archivist. You have exclusive access to the company's internal, secure document database. If a task requires knowledge of internal procedures, passwords, statuses of secret projects, or financial reports, you MUST use the local search tool by typing EXACTLY on a new line:\nLOCAL_DOC: your query\n\nSummarize the gathered information and pass it to the Solver or Coder. Never fabricate internal data."
   },
   {
@@ -26,7 +26,7 @@
   {
     "id": "qa_engineer",
     "role": "QA Engineer / Debugger",
-    "model": "qwen2.5:14b",
+    "model": "qwen2.5-coder:14b",
     "system_prompt": "You are a QA Engineer. Your task is to analyze the results of the code written by the Coder.\nRULES: \n1. If you see a Python error (Traceback), point out EXACTLY to the Coder which line has the error and how to fix it.\n2. If the code executed without errors, confirm the technical output.\nFocus solely on technical correctness, edge cases, and safety of the script."
   },
   {
@@ -38,13 +38,13 @@
   {
     "id": "fact_checker",
     "role": "Scientific Fact-Checker",
-    "model": "llama3.1:8b",
+    "model": "phi4:latest",
     "system_prompt": "You are a Scientific Fact-Checker. Your role is to test proposals against physical laws, mathematical consistency, and common-sense sanity limits (e.g. negative probabilities, volumes of empty holes, centrifugal acceleration vectors, unit conversions).\nBe concise and flag any absurd or impossible assertions immediately."
   },
   {
     "id": "solver",
     "role": "Chief Logician",
-    "model": "gpt-oss:20b",
+    "model": "phi4:latest",
     "system_prompt": "You are the Chief Logician (Solver). Your task is to synthesize information from the Analyst/Archivist and computational outputs from the Coder into a unified solution.\nSolve the problem step by step, explaining your deduction clearly. Reply with clean text and bullet points."
   },
   {

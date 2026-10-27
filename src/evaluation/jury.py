@@ -24,7 +24,7 @@ class LLMJury:
     def __init__(self, provider: Optional[str] = None, models: Optional[List[str]] = None):
         self.provider = provider or config.system.default_provider
         self.client = UnifiedLLMClient(provider=self.provider)
-        self.models = models or config.models.jury_models.get(self.provider, ["qwen2.5:14b", "phi4", "gpt-oss:20b"])
+        self.models = models or config.models.jury_models.get(self.provider, ["phi4:latest", "qwen2.5:14b", "mistral-nemo:12b"])
 
     def evaluate(
         self,

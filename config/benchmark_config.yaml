@@ -34,9 +34,9 @@ models:
 
   jury_models:
     ollama:
-      - "phi4"
+      - "phi4:latest"
       - "qwen2.5:14b"
-      - "gpt-oss:20b"
+      - "mistral-nemo:12b"
     groq:
       - "llama-3.3-70b-versatile"
       - "mixtral-8x7b-32768"
@@ -53,11 +53,15 @@ models:
 pricing_per_1m_tokens:
   "qwen2.5:14b": 2.50
   "qwen2.5-coder:14b": 2.50
+  "phi4:latest": 0.20
+  "phi4": 0.20
+  "mistral-nemo:12b": 0.70
+  "deepseek-r1:14b": 2.50
+  "deepseek-r1:8b": 0.50
   "gemma2:9b": 0.50
   "gemma2:2b": 0.15
   "llama3.1:8b": 0.50
   "gpt-oss:20b": 3.00
-  "phi4": 0.20
   "llama-3.3-70b-versatile": 0.70
   "mixtral-8x7b-32768": 0.27
   "gemma2-9b-it": 0.20

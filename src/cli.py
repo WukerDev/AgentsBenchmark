@@ -46,6 +46,18 @@ def run(
     runner.run()
 
 @app.command()
+def gui(
+    port: int = typer.Option(8000, "--port", "-p", help="Port serwera FastAPI / Vue Vuetify Dashboard"),
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host serwera")
+):
+    """
+    Uruchamia nowoczesny interfejs Vue 3 + Vuetify Dashboard z API FastAPI.
+    """
+    import uvicorn
+    console.print(f"[bold cyan]Uruchamiam nowoczesny Vue 3 + Vuetify Dashboard:[/bold cyan] [bold green]http://{host}:{port}[/bold green]")
+    uvicorn.run("src.server:app", host=host, port=port, reload=False)
+
+@app.command()
 def ui():
     """
     Uruchamia interaktywny interfejs graficzny Web (Streamlit Dashboard).
