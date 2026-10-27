@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Dict, Any
 import pandas as pd
 
+PM = r"\pm"
+
 class ThesisChapterGenerator:
     @classmethod
     def generate(cls, output_dir: Path, df: pd.DataFrame, stats: Dict[str, Any]):
@@ -119,8 +121,8 @@ Uzyskana wyższa precyzja architektury roju wiąże się ze zwiększonym zapotrz
 
 ## 5.6. Przedziały Ufności i Analiza Niepewności Pomiarowej (95% CI)
 Dla wyeliminowania zarzutu stochastyczności modeli LLM wyznaczono przedziały ufności na poziomie ufności $1 - \alpha = 0.95$ oparte na rozkładzie $t$-Studenta:
-- **Solo ReAct (95% CI):** [{solo_ci.get('ci_lower', 0.0):.2f}, {solo_ci.get('ci_upper', 0.0):.2f}] pkt (margines błędu: $\\pm {solo_ci.get('margin', 0.0):.2f}$)
-- **Multi-Agent Swarm (95% CI):** [{multi_ci.get('ci_lower', 0.0):.2f}, {multi_ci.get('ci_upper', 0.0):.2f}] pkt (margines błędu: $\\pm {multi_ci.get('margin', 0.0):.2f}$)
+- **Solo ReAct (95% CI):** [{solo_ci.get('ci_lower', 0.0):.2f}, {solo_ci.get('ci_upper', 0.0):.2f}] pkt (margines błędu: ${PM} {solo_ci.get('margin', 0.0):.2f}$)
+- **Multi-Agent Swarm (95% CI):** [{multi_ci.get('ci_lower', 0.0):.2f}, {multi_ci.get('ci_upper', 0.0):.2f}] pkt (margines błędu: ${PM} {multi_ci.get('margin', 0.0):.2f}$)
 
 Brak nakładania się przedziałów ufności w zadaniach o wysokim stopniu trudności potwierdza odporność statystyczną obserwowanego efektu.
 
@@ -194,7 +196,7 @@ architekturę jednoagentową \\textbf{{Solo ReAct}} oraz wieloagentowy rój dysk
 Eksperyment przeprowadzono na reprezentatywnym zbiorze $N = {n}$ zadań testowych obejmujących m.in. programowanie, analizę logów, dedukcję logiczno-matematyczną oraz odzyskiwanie poufnych danych z bazy wiedzy.
 
 \\subsection{{Analiza Skuteczności i Testy Hipotez}}
-Średni wynik uzyskany przez zespół wieloagentowy wyniósł ${multi_mean:.2f} \\\pm {multi_std:.2f}$~pkt, podczas gdy pojedynczy agent ReAct osiągnął średnio ${solo_mean:.2f} \\\pm {solo_std:.2f}$~pkt,
+Średni wynik uzyskany przez zespół wieloagentowy wyniósł ${multi_mean:.2f} {PM} {multi_std:.2f}$~pkt, podczas gdy pojedynczy agent ReAct osiągnął średnio ${solo_mean:.2f} {PM} {solo_std:.2f}$~pkt,
 co daje statystyczny przyrost jakości o $+{delta:.2f}$~pkt. Architektura wieloagentowa odniosła zwycięstwo w ${wins}$ spośród ${n}$ zadań (wskaźnik wygranych: ${win_rate}\\%$),
 podczas gdy w ${ties}$ przypadkach obie konfiguracje uzyskały identyczny rezultat.
 

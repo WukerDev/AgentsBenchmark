@@ -552,12 +552,12 @@ async def get_task_history(task_id: str):
     )
     matches = pattern.findall(html)
     turns = []
-    for i in range(0, len(matches), 2):
-        role_raw = matches[i][0]
+    for idx, match in enumerate(matches, 1):
+        role_raw = match[0]
         role = role_raw.split('(')[-1].replace(')', '').strip() if '(' in role_raw else role_raw
-        text = (matches[i+1][0] + "\n" + matches[i+1][1]).strip()
+        text = match[1].strip()
         turns.append({
-            "turn": (i // 2) + 1,
+            "turn": idx,
             "role": role,
             "text": text
         })

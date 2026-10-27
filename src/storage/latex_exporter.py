@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Dict, Any
 import pandas as pd
 
+PM = r"\pm"
+
 class LatexExporter:
     @classmethod
     def export(cls, output_dir: Path, df: pd.DataFrame, stats: Dict[str, Any]):
@@ -202,10 +204,10 @@ Zgodność sędziów (Jury Std Dev) & {stats.get('mean_jury_std_dev', 'N/A')} pk
 \\label{{tab:przedzialy_ufnosci}}
 \\begin{{tabular}}{{lcccc}}
 \\hline
-\\textbf{{Architektura}} & \\textbf{{Średnia (Mean)}} & \\textbf{{Odchylenie Std.}} & \\textbf{{Błąd Marginesu ($\\pm h$)}} & \\textbf{{95\\% Przedział Ufności}} \\\\
+\\textbf{{Architektura}} & \\textbf{{Średnia (Mean)}} & \\textbf{{Odchylenie Std.}} & \\textbf{{Błąd Marginesu (${PM} h$)}} & \\textbf{{95\\% Przedział Ufności}} \\\\
 \\hline
-Solo ReAct & {solo_ci.get('mean', 0.0):.2f} & {solo_ci.get('std', 0.0):.2f} & $\\pm {solo_ci.get('margin', 0.0):.2f}$ & [{solo_ci.get('ci_lower', 0.0):.2f}, {solo_ci.get('ci_upper', 0.0):.2f}] \\\\
-Multi-Agent Swarm & {multi_ci.get('mean', 0.0):.2f} & {multi_ci.get('std', 0.0):.2f} & $\\pm {multi_ci.get('margin', 0.0):.2f}$ & [{multi_ci.get('ci_lower', 0.0):.2f}, {multi_ci.get('ci_upper', 0.0):.2f}] \\\\
+Solo ReAct & {solo_ci.get('mean', 0.0):.2f} & {solo_ci.get('std', 0.0):.2f} & ${PM} {solo_ci.get('margin', 0.0):.2f}$ & [{solo_ci.get('ci_lower', 0.0):.2f}, {solo_ci.get('ci_upper', 0.0):.2f}] \\\\
+Multi-Agent Swarm & {multi_ci.get('mean', 0.0):.2f} & {multi_ci.get('std', 0.0):.2f} & ${PM} {multi_ci.get('margin', 0.0):.2f}$ & [{multi_ci.get('ci_lower', 0.0):.2f}, {multi_ci.get('ci_upper', 0.0):.2f}] \\\\
 \\hline
 \\end{{tabular}}
 \\end{{table}}
