@@ -166,3 +166,49 @@ Zgodność sędziów (Jury Std Dev) & {stats.get('mean_jury_std_dev', 'N/A')} pk
 """
         with open(output_dir / "tabela_statystyk.tex", "w", encoding="utf-8") as f:
             f.write(stat_latex)
+
+        # 6. Failure Taxonomy Table (Master's level qualitative analysis)
+        tax_info = stats.get("failure_taxonomy", {})
+        breakdown = tax_info.get("breakdown", [])
+        tax_rows = []
+        for b in breakdown:
+            tax_rows.append(f"{b['category']} & {b['count']} & {b['percentage']}\\% \\\\")
+
+        tax_latex = f"""\\begin{{table}}[htbp]
+\\centering
+\\caption{{Taksonomia błędów i patologii komunikacji roju wieloagentowego}}
+\\label{{tab:taksonomia_bledow}}
+\\begin{{tabular}}{{lcc}}
+\\hline
+\\textbf{{Kategoria Zjawiska / Błędu}} & \\textbf{{Liczba Przypadków}} & \\textbf{{Udział Procentowy}} \\\\
+\\hline
+""" + "\n".join(tax_rows) + f"""
+\\hline
+\\textbf{{Łącznie zadań}} & {tax_info.get('total_tasks', len(df))} & 100.0\\% \\\\
+\\textbf{{Skuteczność całkowita (brak błędu)}} & - & \\textbf{{{tax_info.get('success_rate', 100.0)}\\%}} \\\\
+\\hline
+\\end{{tabular}}
+\\end{{table}}
+"""
+        with open(output_dir / "tabela_taksonomii_bledow.tex", "w", encoding="utf-8") as f:
+            f.write(tax_latex)
+
+        # 7. Confidence Intervals Table (95% CI)
+        solo_ci = stats.get("solo_ci", {})
+        multi_ci = stats.get("multi_ci", {})
+        ci_latex = f"""\\begin{{table}}[htbp]
+\\centering
+\\caption{{Przedziały ufności 95\\% CI dla średnich wyników punktowych (Rozkład $t$-Studenta)}}
+\\label{{tab:przedzialy_ufnosci}}
+\\begin{{tabular}}{{lcccc}}
+\\hline
+\\textbf{{Architektura}} & \\textbf{{Średnia (Mean)}} & \\textbf{{Odchylenie Std.}} & \\textbf{{Błąd Marginesu ($\\pm h$)}} & \\textbf{{95\\% Przedział Ufności}} \\\\
+\\hline
+Solo ReAct & {solo_ci.get('mean', 0.0):.2f} & {solo_ci.get('std', 0.0):.2f} & $\\pm {solo_ci.get('margin', 0.0):.2f}$ & [{solo_ci.get('ci_lower', 0.0):.2f}, {solo_ci.get('ci_upper', 0.0):.2f}] \\\\
+Multi-Agent Swarm & {multi_ci.get('mean', 0.0):.2f} & {multi_ci.get('std', 0.0):.2f} & $\\pm {multi_ci.get('margin', 0.0):.2f}$ & [{multi_ci.get('ci_lower', 0.0):.2f}, {multi_ci.get('ci_upper', 0.0):.2f}] \\\\
+\\hline
+\\end{{tabular}}
+\\end{{table}}
+"""
+        with open(output_dir / "tabela_przedzialow_ufnosci.tex", "w", encoding="utf-8") as f:
+            f.write(ci_latex)

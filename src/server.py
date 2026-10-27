@@ -27,6 +27,10 @@ from src.storage.excel_exporter import ExcelBenchmarkExporter
 from src.storage.latex_exporter import LatexExporter
 from src.storage.thesis_chapter_generator import ThesisChapterGenerator
 from src.visualization.plots import BenchmarkVisualizer
+from src.hardware.telemetry import HardwareProfiler
+from src.agents.baselines import SoloBestOfNRunner, SoloReflexionRunner
+from src.benchmark.ablation import ABLATION_VARIANTS, create_ablation_runner
+from src.evaluation.failure_taxonomy import FailureTaxonomy
 
 app = FastAPI(
     title="AiAgents Task Solving Benchmark API",
@@ -80,11 +84,29 @@ class StartBenchmarkRequest(BaseModel):
 class SingleTaskRequest(BaseModel):
     task_id: str
     provider: Optional[str] = "ollama"
+    mode: Optional[str] = "full"
+    ablation_variant: Optional[str] = "full_swarm"
 
 class PullModelRequest(BaseModel):
     model: str
 
 # ----------------- ENDPOINTS -----------------
+
+@app.get("/api/ablation/variants")
+async def get_ablation_variants():
+    return ABLATION_VARIANTS
+
+@app.get("/api/hardware/telemetry")
+async def get_hardware_telemetry():
+    return HardwareProfiler.get_gpu_status()
+
+@app.get("/api/reports/thesis-methodology")
+async def get_thesis_methodology():
+    doc_path = BASE_DIR / "docs" / "METODOLOGIA_BADANIA_MAGISTERSKIEGO.md"
+    if not doc_path.exists():
+        return {"content": "Dokumentacja metodologii magisterskiej w przygotowaniu."}
+    with open(doc_path, "r", encoding="utf-8") as f:
+        return {"content": f.read()}
 
 @app.get("/api/ollama/models")
 async def get_ollama_models():
@@ -179,7 +201,8 @@ async def get_status():
         "ollama_online": ollama_online,
         "ollama_models": ollama_models,
         "default_provider": config.system.default_provider,
-        "gpu_device": "NVIDIA GeForce RTX 5080 (16 GB GDDR7)"
+        "gpu_device": "NVIDIA GeForce RTX 5080 (16 GB GDDR7)",
+        "gpu_telemetry": HardwareProfiler.get_gpu_status()
     }
 
 @app.get("/api/tasks")
@@ -375,13 +398,51 @@ async def run_single_task(req: SingleTaskRequest):
     if not target_task:
         raise HTTPException(status_code=404, detail="Nie znaleziono zadania")
 
-    # Run Solo
-    solo_runner = SoloAgentRunner(provider=req.provider)
-    solo_res = solo_runner.run(target_task["query"])
+    # Start Hardware Profiling Tracker
+    tracker = HardwareProfiler.profile_session()
 
-    # Run Swarm with turn tracking
+    # Determine baseline / mode
+    mode = req.mode or "full"
+    baseline_info = None
+
+    if mode == "reflexion":
+        refl_runner = SoloReflexionRunner(provider=req.provider)
+        refl_res = refl_runner.run(target_task["query"])
+        baseline_info = {
+            "type": "reflexion",
+            "initial_draft": refl_res["initial_draft"],
+            "critique": refl_res["critique"],
+            "final_answer": refl_res["final_answer"],
+            "tokens": refl_res["tokens"],
+            "time": refl_res["total_time"]
+        }
+        solo_ans = refl_res["final_answer"]
+        solo_time = refl_res["total_time"]
+        solo_tokens = refl_res["tokens"]
+    elif mode == "best_of_n":
+        bon_runner = SoloBestOfNRunner(provider=req.provider, n_samples=3)
+        bon_res = bon_runner.run(target_task["query"])
+        baseline_info = {
+            "type": "best_of_n",
+            "n_samples": bon_res["n_samples"],
+            "final_answer": bon_res["final_answer"],
+            "tokens": bon_res["tokens"],
+            "time": bon_res["total_time"]
+        }
+        solo_ans = bon_res["final_answer"]
+        solo_time = bon_res["total_time"]
+        solo_tokens = bon_res["tokens"]
+    else:
+        solo_runner = SoloAgentRunner(provider=req.provider)
+        solo_res = solo_runner.run(target_task["query"])
+        solo_ans = solo_res["final_answer"]
+        solo_time = solo_res["total_time"]
+        solo_tokens = solo_res["tokens"]
+
+    # Run Swarm with turn tracking (with optional ablation variant)
     debate_turns = []
     def on_turn(turn_idx, role, response_text, tool_out):
+        tracker.sample()
         debate_turns.append({
             "turn": turn_idx,
             "role": role,
@@ -389,7 +450,12 @@ async def run_single_task(req: SingleTaskRequest):
             "tool_output": tool_out
         })
 
-    multi_runner = MultiAgentSwarmRunner(provider=req.provider)
+    ablation_variant = req.ablation_variant or "full_swarm"
+    if ablation_variant != "full_swarm":
+        multi_runner = create_ablation_runner(ablation_variant, provider=req.provider)
+    else:
+        multi_runner = MultiAgentSwarmRunner(provider=req.provider)
+
     group_res = multi_runner.run(target_task["query"], on_turn_callback=on_turn)
 
     # Jury Evaluation
@@ -397,24 +463,41 @@ async def run_single_task(req: SingleTaskRequest):
     jury_eval = jury.evaluate(
         target_task["query"],
         target_task.get("expected_answer", ""),
-        solo_res["final_answer"],
+        solo_ans,
         group_res["snapshot_5"],
         group_res["snapshot_10"],
         group_res["final_answer"]
     )
 
     # Ground Truth
-    gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(target_task["id"], solo_res["final_answer"])
+    gt_solo_score, gt_solo_ok, gt_solo_expl = GroundTruthVerifier.verify(target_task["id"], solo_ans)
     gt_multi_score, gt_multi_ok, gt_multi_expl = GroundTruthVerifier.verify(target_task["id"], group_res["final_answer"])
+
+    # Finish Hardware Telemetry
+    telemetry = tracker.finish(total_tokens=solo_tokens + group_res["tokens"])
+
+    # Classify failure taxonomy
+    mock_row = {
+        "score_multi_final": jury_eval.score_multi_final,
+        "gt_multi_score": gt_multi_score,
+        "multi_turns": len(debate_turns),
+        "multi_tool_errors": group_res.get("tool_error_count", 0),
+        "hallucination_multi": jury_eval.hallucination_multi,
+        "agent_path": group_res.get("agent_path", "")
+    }
+    failure_label = FailureTaxonomy.classify_record(mock_row)
 
     return {
         "task_id": req.task_id,
         "query": target_task["query"],
         "expected_answer": target_task.get("expected_answer", ""),
+        "mode": mode,
+        "ablation_variant": ablation_variant,
+        "baseline_info": baseline_info,
         "solo": {
-            "final_answer": solo_res["final_answer"],
-            "time": solo_res["total_time"],
-            "tokens": solo_res["tokens"],
+            "final_answer": solo_ans,
+            "time": solo_time,
+            "tokens": solo_tokens,
             "score": jury_eval.score_solo,
             "gt_score": gt_solo_score
         },
@@ -433,7 +516,9 @@ async def run_single_task(req: SingleTaskRequest):
             "reasons": jury_eval.jury_reasons,
             "std_dev": jury_eval.jury_std_dev,
             "individual_scores": jury_eval.individual_scores
-        }
+        },
+        "telemetry": telemetry,
+        "failure_taxonomy": failure_label
     }
 
 @app.get("/api/interactive/task/{task_id}")

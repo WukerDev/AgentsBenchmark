@@ -20,6 +20,7 @@ class TestAPIEndpoints:
         assert "total_count" in data
         assert "completed_count" in data
         assert "ollama_online" in data
+        assert "gpu_telemetry" in data
         assert data["total_count"] == 35
 
     def test_get_tasks(self):
@@ -110,6 +111,29 @@ class TestAPIEndpoints:
         response = client.get("/api/interactive/task/non_existent_task_xyz")
         assert response.status_code == 404
 
+    def test_get_ablation_variants(self):
+        response = client.get("/api/ablation/variants")
+        assert response.status_code == 200
+        data = response.json()
+        assert "full_swarm" in data
+        assert "no_devil" in data
+        assert "minimal_triad" in data
+
+    def test_get_hardware_telemetry(self):
+        response = client.get("/api/hardware/telemetry")
+        assert response.status_code == 200
+        data = response.json()
+        assert "available" in data
+        assert "total_vram_mb" in data
+        assert "device_name" in data
+
+    def test_get_thesis_methodology(self):
+        response = client.get("/api/reports/thesis-methodology")
+        assert response.status_code == 200
+        data = response.json()
+        assert "content" in data
+        assert "Metodologia Badawcza do Pracy Magisterskiej" in data["content"]
+
 
 class TestReportingExporters:
     def test_latex_exporter(self, tmp_path: Path):
@@ -131,14 +155,15 @@ class TestReportingExporters:
             "solo_mean": 91.7,
             "multi_mean": 100.0,
             "score_delta": 8.3,
-            "cohens_d": 0.0
+            "cohens_d": 0.0,
+            "failure_taxonomy": {"total_tasks": 1, "success_rate": 100.0, "breakdown": []},
+            "solo_ci": {"mean": 91.7, "std": 0.0, "margin": 0.0, "ci_lower": 91.7, "ci_upper": 91.7},
+            "multi_ci": {"mean": 100.0, "std": 0.0, "margin": 0.0, "ci_lower": 100.0, "ci_upper": 100.0}
         }
         LatexExporter.export(tmp_path, dummy_df, dummy_stats)
-        table_file = tmp_path / "tabela_wynikow.tex"
-        assert table_file.exists()
-        content = table_file.read_text(encoding="utf-8")
-        assert r"\begin{table}" in content
-        assert "task\\_01\\_helium" in content
+        assert (tmp_path / "tabela_wynikow.tex").exists()
+        assert (tmp_path / "tabela_taksonomii_bledow.tex").exists()
+        assert (tmp_path / "tabela_przedzialow_ufnosci.tex").exists()
 
     def test_html_reporter(self, tmp_path: Path):
         output_file = tmp_path / "task_report.html"

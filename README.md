@@ -1,12 +1,15 @@
 # AiAgents Task Solving Benchmark 🚀
-**Projekt Badawczy do Pracy Inżynierskiej**
-*Porównanie skuteczności pojedynczego agenta (Solo ReAct) oraz roju wieloagentowego (Multi-Agent Swarm) na złożonych problemach analitycznych, logicznych i programistycznych.*
+**Projekt Badawczy do Pracy Magisterskiej / Inżynierskiej**
+*Porównanie skuteczności pojedynczego agenta (Solo ReAct), zaawansowanych baseline'ów (Reflexion, Best-of-3) oraz roju wieloagentowego (Multi-Agent Swarm) przy zrównanym budżecie obliczeniowym na GPU RTX 5080 (16 GB).*
 
 [![CI/CD Pipeline](https://github.com/Wiktor/AgentsBenchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/Wiktor/AgentsBenchmark/actions/workflows/ci.yml)
 ![Python 3.11 | 3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
-![Tests](https://img.shields.io/badge/tests-31%20passed-brightgreen.svg)
+![Tests](https://img.shields.io/badge/tests-44%20passed-brightgreen.svg)
 ![Vue 3 & Vuetify](https://img.shields.io/badge/frontend-Vue%203%20%2B%20Vuetify%203-41B883.svg)
 ![Ollama Ready](https://img.shields.io/badge/ollama-local%20llm-black.svg)
+[![Metodologia Magisterska](https://img.shields.io/badge/docs-Metodologia%20Magisterska-blueviolet.svg)](docs/METODOLOGIA_BADANIA_MAGISTERSKIEGO.md)
+
+> 📘 **Dokumentacja Akademicka:** Szczegółowy model formalny, formalizację grafu roju $G=(V, E)$, 4 hipotezy badawcze, badanie ablacyjne, zrównanie kosztu tokenów oraz taksonomię błędów znajdziesz w dokumencie: **[`docs/METODOLOGIA_BADANIA_MAGISTERSKIEGO.md`](docs/METODOLOGIA_BADANIA_MAGISTERSKIEGO.md)**.
 
 ---
 

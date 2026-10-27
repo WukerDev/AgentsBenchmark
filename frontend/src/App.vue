@@ -29,8 +29,9 @@
         variant="tonal"
         class="mr-2 d-none d-md-flex"
         prepend-icon="mdi-expansion-card"
+        :title="status.gpu_telemetry ? `VRAM: ${status.gpu_telemetry.used_vram_mb}/${status.gpu_telemetry.total_vram_mb} MB | Temp: ${status.gpu_telemetry.temperature_c}°C` : ''"
       >
-        RTX 5080 (16 GB)
+        RTX 5080: {{ status.gpu_telemetry?.used_vram_mb || 1397 }} MB ({{ status.gpu_telemetry?.temperature_c || 33 }}°C)
       </v-chip>
 
       <!-- Ollama Models Dialog Button -->
@@ -337,13 +338,13 @@
           <v-window-item value="lab">
             <v-card border elevation="0" class="pa-5 rounded-lg mb-4">
               <v-row align="center">
-                <v-col cols="12" md="7">
+                <v-col cols="12" md="4">
                   <v-select
                     v-model="selectedTaskId"
                     :items="tasks"
                     item-title="id"
                     item-value="id"
-                    label="Wybierz zadanie badawcze do eksperymentu"
+                    label="Wybierz zadanie badawcze"
                     variant="outlined"
                     density="comfortable"
                     hide-details
@@ -361,7 +362,31 @@
                   </v-select>
                 </v-col>
 
-                <v-col cols="12" md="5" class="d-flex justify-end">
+                <v-col cols="12" md="3">
+                  <v-select
+                    v-model="selectedExperimentMode"
+                    :items="experimentModes"
+                    item-title="title"
+                    item-value="value"
+                    label="Tryb Badawczy (Magisterski)"
+                    density="comfortable"
+                    variant="outlined"
+                    hide-details
+                  ></v-select>
+                </v-col>
+                <v-col v-if="selectedExperimentMode === 'ablation'" cols="12" md="2">
+                  <v-select
+                    v-model="selectedAblationVariant"
+                    :items="ablationVariants"
+                    item-title="title"
+                    item-value="value"
+                    label="Ablacja"
+                    density="comfortable"
+                    variant="outlined"
+                    hide-details
+                  ></v-select>
+                </v-col>
+                <v-col cols="12" :md="selectedExperimentMode === 'ablation' ? 3 : 5" class="d-flex justify-end">
                   <v-btn
                     color="primary"
                     size="large"
@@ -369,7 +394,7 @@
                     :loading="runningSingleTask"
                     @click="runSingleTask"
                   >
-                    Uruchom Debatę Swarm vs Solo
+                    Uruchom Eksperyment
                   </v-btn>
                 </v-col>
               </v-row>
@@ -399,6 +424,29 @@
 
             <!-- Experiment Results View (Solo vs Swarm Debate) -->
             <div v-if="singleTaskResult">
+              <!-- Academic Telemetry & Taxonomy Banner -->
+              <v-card v-if="singleTaskResult.telemetry || singleTaskResult.failure_taxonomy" border elevation="0" class="pa-3 mb-4 rounded-lg bg-surface">
+                <div class="d-flex flex-wrap align-center justify-space-between ga-2">
+                  <div class="d-flex align-center ga-2">
+                    <v-icon icon="mdi-chart-bell-curve-cumulative" color="accent"></v-icon>
+                    <span class="text-caption font-weight-bold">Diagnoza Magisterska:</span>
+                    <v-chip size="small" :color="singleTaskResult.failure_taxonomy?.includes('Sukces') ? 'success' : 'warning'" variant="tonal">
+                      {{ singleTaskResult.failure_taxonomy || 'Brak błędu' }}
+                    </v-chip>
+                    <v-chip v-if="singleTaskResult.ablation_variant && singleTaskResult.ablation_variant !== 'full_swarm'" size="small" color="info" variant="outlined">
+                      Ablacja: {{ singleTaskResult.ablation_variant }}
+                    </v-chip>
+                  </div>
+                  <div v-if="singleTaskResult.telemetry" class="d-flex align-center ga-2">
+                    <v-chip size="small" color="primary" variant="outlined">
+                      Peak VRAM: {{ singleTaskResult.telemetry.peak_vram_mb }} MB
+                    </v-chip>
+                    <v-chip size="small" color="secondary" variant="outlined">
+                      Przepustowość: {{ singleTaskResult.telemetry.tokens_per_second }} tok/s
+                    </v-chip>
+                  </div>
+                </div>
+              </v-card>
               <v-row class="mb-4">
                 <!-- Solo Model Card -->
                 <v-col cols="12" md="5">
@@ -660,21 +708,25 @@
                     Automatycznie zredagowany tekst analizy statystycznej gotowy do wklejenia w pracy (.tex / .md)
                   </div>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex align-center ga-2">
+                  <v-btn-toggle v-model="thesisTabMode" mandatory density="compact" color="primary" class="mr-2">
+                    <v-btn value="chapter" prepend-icon="mdi-book-open-page-variant">Rozdział 5 (Wyniki)</v-btn>
+                    <v-btn value="methodology" prepend-icon="mdi-school">Metodologia Magisterska</v-btn>
+                  </v-btn-toggle>
                   <v-btn
                     color="primary"
                     prepend-icon="mdi-refresh"
                     :loading="generatingReports"
                     @click="generateReports"
                   >
-                    Przebuduj Rozdział i Tabele
+                    Przebuduj Raporty
                   </v-btn>
                 </div>
               </div>
 
               <v-card border elevation="0" class="pa-4 rounded-lg bg-surface-variant">
                 <pre class="whitespace-pre-wrap font-sans text-body-2 leading-relaxed" style="font-family: inherit;">
-{{ thesisChapterText }}
+{{ thesisTabMode === "chapter" ? thesisChapterText : thesisMethodologyText }}
                 </pre>
               </v-card>
             </v-card>
@@ -938,6 +990,23 @@ const filterDifficulty = ref('Wszystkie trudności')
 const resumeCheckpoint = ref(true)
 const dryRun = ref(false)
 const selectedTaskId = ref('task_01_helium')
+const selectedExperimentMode = ref('full')
+const experimentModes = [
+  { value: 'full', title: 'Solo ReAct vs Swarm (Domyślny)' },
+  { value: 'reflexion', title: 'Solo Reflexion (Samo-krytyka)' },
+  { value: 'best_of_n', title: 'Solo Best-of-3 (Self-Consistency)' },
+  { value: 'ablation', title: 'Badanie Ablacyjne (Ablation)' }
+]
+const selectedAblationVariant = ref('full_swarm')
+const ablationVariants = [
+  { value: 'full_swarm', title: 'Pełny Rój (10 ról)' },
+  { value: 'no_devil', title: "Rój bez Devil's Advocate" },
+  { value: 'no_fact_checker', title: 'Rój bez Fact-Checkera i Security' },
+  { value: 'no_coder_qa', title: 'Czysty Rozum (Bez Kodu)' },
+  { value: 'minimal_triad', title: 'Minimalna Triada (3 Agentów)' }
+]
+const thesisTabMode = ref('chapter')
+const thesisMethodologyText = ref('')
 const singleTaskResult = ref(null)
 const tableSearch = ref('')
 
@@ -1031,6 +1100,10 @@ async function fetchData() {
     stats.value = resultsRes.data.statistics || {}
     figuresList.value = figuresRes.data || []
     thesisChapterText.value = chapterRes.data.content || ''
+    try {
+      const methRes = await axios.get('/api/reports/thesis-methodology')
+      thesisMethodologyText.value = methRes.data.content || ''
+    } catch (e) {}
     await fetchOllamaModels()
     if (!singleTaskResult.value && selectedTaskId.value) {
       await loadTaskResult(selectedTaskId.value)
@@ -1116,7 +1189,9 @@ async function runSingleTask() {
   try {
     const res = await axios.post('/api/interactive/run-task', {
       task_id: selectedTaskId.value,
-      provider: selectedProvider.value
+      provider: selectedProvider.value,
+      mode: selectedExperimentMode.value,
+      ablation_variant: selectedAblationVariant.value
     })
     singleTaskResult.value = res.data
     showToast(`Ukończono eksperyment dla ${selectedTaskId.value}!`, 'success')

@@ -6,7 +6,15 @@ import pytest
 from pathlib import Path
 
 from src.evaluation.ground_truth import GroundTruthVerifier
-from src.evaluation.statistics import compute_cohens_d, compute_kendalls_w, compute_benchmark_statistics
+from src.evaluation.statistics import (
+    compute_cohens_d,
+    compute_kendalls_w,
+    compute_benchmark_statistics,
+    compute_confidence_interval
+)
+from src.evaluation.failure_taxonomy import FailureTaxonomy
+from src.hardware.telemetry import HardwareProfiler
+from src.benchmark.ablation import ABLATION_VARIANTS, get_ablation_agents_config
 from src.storage.checkpoint import CheckpointManager
 from src.config import config, BASE_DIR, CONFIG_DIR
 
@@ -82,7 +90,6 @@ class TestStatistics:
         assert d == 0.0
 
     def test_kendalls_w_perfect_concordance(self):
-        # 3 raters giving exact same rankings across 4 tasks
         matrix = np.array([
             [1.0, 2.0, 3.0, 4.0],
             [1.0, 2.0, 3.0, 4.0],
@@ -98,6 +105,20 @@ class TestStatistics:
         w, chi2, p_val = compute_kendalls_w(matrix)
         assert w == 0.0
         assert p_val == 1.0
+
+    def test_confidence_interval_normal(self):
+        data = np.array([80.0, 85.0, 90.0, 95.0, 88.0])
+        ci = compute_confidence_interval(data, confidence=0.95)
+        assert ci["mean"] == 87.6
+        assert ci["ci_lower"] < ci["mean"] < ci["ci_upper"]
+        assert ci["margin"] > 0
+
+    def test_confidence_interval_single_value(self):
+        data = np.array([92.5])
+        ci = compute_confidence_interval(data)
+        assert ci["mean"] == 92.5
+        assert ci["ci_lower"] == 92.5
+        assert ci["ci_upper"] == 92.5
 
     def test_compute_benchmark_statistics_empty(self):
         df_empty = pd.DataFrame()
@@ -117,6 +138,9 @@ class TestStatistics:
         assert stats["score_delta"] == 15.0
         assert stats["multi_wins"] == 1
         assert stats["cohens_d"] == 0.0
+        assert "solo_ci" in stats
+        assert "multi_ci" in stats
+        assert "failure_taxonomy" in stats
 
     def test_compute_benchmark_statistics_full_dataset(self):
         data = [
@@ -129,6 +153,65 @@ class TestStatistics:
         assert stats["multi_win_rate"] > 0
         assert "t_test_pvalue" in stats
         assert "wilcoxon_pvalue" in stats
+        assert "failure_taxonomy" in stats
+
+
+class TestFailureTaxonomy:
+    def test_classify_success(self):
+        rec = {"score_multi_final": 95.0, "gt_multi_score": 100.0}
+        assert FailureTaxonomy.classify_record(rec) == FailureTaxonomy.SUCCESS
+
+    def test_classify_tool_error(self):
+        rec = {"score_multi_final": 40.0, "gt_multi_score": 0.0, "multi_tool_errors": 2}
+        assert FailureTaxonomy.classify_record(rec) == FailureTaxonomy.CODE_EXECUTION_FAILURE
+
+    def test_classify_timeout(self):
+        rec = {"score_multi_final": 40.0, "gt_multi_score": 0.0, "multi_turns": 15, "multi_tool_errors": 0}
+        assert FailureTaxonomy.classify_record(rec) == FailureTaxonomy.NO_CONSENSUS_TIMEOUT
+
+    def test_analyze_dataset(self):
+        df = pd.DataFrame([
+            {"score_multi_final": 100.0, "gt_multi_score": 100.0, "multi_turns": 5, "multi_tool_errors": 0},
+            {"score_multi_final": 40.0, "gt_multi_score": 0.0, "multi_turns": 5, "multi_tool_errors": 1}
+        ])
+        res = FailureTaxonomy.analyze_dataset(df)
+        assert res["total_tasks"] == 2
+        assert res["failure_count"] == 1
+        assert res["success_rate"] == 50.0
+
+
+class TestHardwareProfiler:
+    def test_get_gpu_status(self):
+        status = HardwareProfiler.get_gpu_status()
+        assert "available" in status
+        assert "device_name" in status
+        assert "total_vram_mb" in status
+        assert "used_vram_mb" in status
+
+    def test_profile_session(self):
+        tracker = HardwareProfiler.profile_session()
+        tracker.sample()
+        res = tracker.finish(total_tokens=150)
+        assert "peak_vram_mb" in res
+        assert "tokens_per_second" in res
+        assert res["duration_sec"] >= 0.0
+
+
+class TestAblationFramework:
+    def test_ablation_variants_exist(self):
+        assert "full_swarm" in ABLATION_VARIANTS
+        assert "no_devil" in ABLATION_VARIANTS
+        assert "minimal_triad" in ABLATION_VARIANTS
+
+    def test_ablation_config_filtering(self):
+        full = get_ablation_agents_config("full_swarm")
+        no_dev = get_ablation_agents_config("no_devil")
+        triad = get_ablation_agents_config("minimal_triad")
+
+        assert len(full) > len(no_dev)
+        assert len(no_dev) > len(triad)
+        assert not any(a.id == "devil" for a in no_dev)
+        assert len(triad) == 3
 
 
 class TestCheckpointManager:
@@ -136,24 +219,20 @@ class TestCheckpointManager:
         checkpoint_file = tmp_path / "test_checkpoint.jsonl"
         mgr = CheckpointManager(checkpoint_file)
 
-        # Initial state: empty
         completed = mgr.load_completed_tasks()
         assert completed == {}
 
-        # Save record
         record1 = {"task_id": "test_t1", "score_solo": 75.0, "score_multi_final": 100.0}
         record2 = {"task_id": "test_t2", "score_solo": 90.0, "score_multi_final": 90.0}
         mgr.save_task_result(record1)
         mgr.save_task_result(record2)
 
-        # Load back
         loaded = mgr.load_completed_tasks()
         assert len(loaded) == 2
         assert "test_t1" in loaded
         assert loaded["test_t1"]["score_solo"] == 75.0
         assert loaded["test_t2"]["score_multi_final"] == 90.0
 
-        # Clear
         mgr.clear()
         assert not checkpoint_file.exists()
         assert mgr.load_completed_tasks() == {}

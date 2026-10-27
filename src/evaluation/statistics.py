@@ -3,6 +3,31 @@ from typing import List, Dict, Any, Tuple
 import pandas as pd
 import numpy as np
 from scipy import stats
+from src.evaluation.failure_taxonomy import FailureTaxonomy
+
+def compute_confidence_interval(data: np.ndarray, confidence: float = 0.95) -> Dict[str, float]:
+    """
+    Computes mean, standard error, and confidence interval bounds using Student's t-distribution.
+    """
+    a = np.asanyarray(data).astype(float)
+    n = len(a)
+    if n < 2:
+        val = float(a[0]) if n == 1 else 0.0
+        return {"mean": val, "std": 0.0, "ci_lower": val, "ci_upper": val, "margin": 0.0}
+
+    mean = float(np.mean(a))
+    sem = stats.sem(a)
+    if np.isnan(sem) or sem == 0:
+        return {"mean": mean, "std": 0.0, "ci_lower": mean, "ci_upper": mean, "margin": 0.0}
+
+    h = sem * stats.t.ppf((1 + confidence) / 2., n - 1)
+    return {
+        "mean": round(mean, 2),
+        "std": round(float(np.std(a, ddof=1)), 2),
+        "ci_lower": round(max(0.0, mean - h), 2),
+        "ci_upper": round(min(100.0, mean + h), 2),
+        "margin": round(float(h), 2)
+    }
 
 def compute_cohens_d(x: np.ndarray, y: np.ndarray) -> float:
     if len(x) <= 1:
@@ -46,9 +71,11 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
         "solo_mean": round(float(np.mean(solo_scores)), 2),
         "solo_std": round(float(np.std(solo_scores)), 2),
         "solo_median": round(float(np.median(solo_scores)), 2),
+        "solo_ci": compute_confidence_interval(solo_scores),
         "multi_mean": round(float(np.mean(multi_scores)), 2),
         "multi_std": round(float(np.std(multi_scores)), 2),
         "multi_median": round(float(np.median(multi_scores)), 2),
+        "multi_ci": compute_confidence_interval(multi_scores),
         "score_delta": round(float(np.mean(multi_scores) - np.mean(solo_scores)), 2),
         "cohens_d": round(compute_cohens_d(multi_scores, solo_scores), 3)
     }
@@ -136,5 +163,8 @@ def compute_benchmark_statistics(df: pd.DataFrame) -> Dict[str, Any]:
             "final_mean": round(float(df["score_multi_final"].mean()), 2),
             "debate_gain": round(float(df["score_multi_final"].mean() - df["score_multi_5"].mean()), 2)
         }
+
+    # Failure Taxonomy analysis
+    stats_dict["failure_taxonomy"] = FailureTaxonomy.analyze_dataset(df)
 
     return stats_dict
