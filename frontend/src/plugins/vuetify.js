@@ -16,6 +16,9 @@ export default createVuetify({
           background: '#0D1117',
           surface: '#161B22',
           'surface-variant': '#21262D',
+          'on-background': '#F0F6FC',
+          'on-surface': '#F0F6FC',
+          'on-surface-variant': '#E6EDF3',
           primary: '#58A6FF',
           secondary: '#7EE787',
           accent: '#A371F7',
@@ -23,6 +26,11 @@ export default createVuetify({
           info: '#388BFD',
           success: '#3FB950',
           warning: '#D29922'
+        },
+        variables: {
+          'high-emphasis-opacity': 0.95,
+          'medium-emphasis-opacity': 0.8,
+          'disabled-opacity': 0.5
         }
       },
       light: {
@@ -30,7 +38,10 @@ export default createVuetify({
         colors: {
           background: '#F6F8FA',
           surface: '#FFFFFF',
-          'surface-variant': '#F3F4F6',
+          'surface-variant': '#EEF2F6',
+          'on-background': '#1F2328',
+          'on-surface': '#1F2328',
+          'on-surface-variant': '#24292F',
           primary: '#0969DA',
           secondary: '#1A7F37',
           accent: '#8250DF',
@@ -38,6 +49,11 @@ export default createVuetify({
           info: '#0969DA',
           success: '#1A7F37',
           warning: '#9A6700'
+        },
+        variables: {
+          'high-emphasis-opacity': 0.95,
+          'medium-emphasis-opacity': 0.8,
+          'disabled-opacity': 0.5
         }
       }
     }

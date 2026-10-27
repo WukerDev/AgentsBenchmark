@@ -33,6 +33,18 @@
         RTX 5080 (16 GB)
       </v-chip>
 
+      <!-- Ollama Models Dialog Button -->
+      <v-btn
+        size="small"
+        variant="tonal"
+        color="primary"
+        prepend-icon="mdi-download"
+        class="mr-2"
+        @click="openModelDialog"
+      >
+        Modele Ollama
+      </v-btn>
+
       <!-- Provider Select -->
       <div style="width: 140px;" class="mr-2">
         <v-select
@@ -464,7 +476,7 @@
                     Werdykt Panelu Sędziowskiego (LLM-as-a-Jury): Microsoft Phi-4 • Alibaba Qwen 2.5 • Mistral-NeMo
                   </span>
                 </div>
-                <div class="text-body-2 text-medium-emphasis font-italic mt-1">
+                <div class="text-body-2 font-italic mt-1 font-weight-medium">
                   {{ singleTaskResult.jury.reasons }}
                 </div>
               </v-card>
@@ -481,14 +493,24 @@
                     Dostosuj modele dla RTX 5080 (16 GB) oraz prompty systemowe poszczególnych agentów
                   </div>
                 </div>
-                <v-btn
-                  color="primary"
-                  prepend-icon="mdi-content-save-outline"
-                  :loading="savingAgents"
-                  @click="saveAgentsConfig"
-                >
-                  Zapisz Konfigurację
-                </v-btn>
+                <div class="d-flex ga-2">
+                  <v-btn
+                    color="secondary"
+                    variant="tonal"
+                    prepend-icon="mdi-download"
+                    @click="openModelDialog"
+                  >
+                    Pobierz model Ollama
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-content-save-outline"
+                    :loading="savingAgents"
+                    @click="saveAgentsConfig"
+                  >
+                    Zapisz Konfigurację
+                  </v-btn>
+                </div>
               </div>
 
               <v-row>
@@ -613,13 +635,15 @@
                 >
                   <v-card border elevation="0" class="pa-2 rounded-lg bg-surface">
                     <div class="text-subtitle-2 font-weight-bold pa-2">{{ fig }}</div>
-                    <v-img
-                      :src="'/api/figures/' + fig"
-                      cover
-                      height="300"
-                      class="rounded bg-surface-variant cursor-pointer"
-                      @click="openImage('/api/figures/' + fig)"
-                    ></v-img>
+                    <div class="figure-container rounded pa-2 bg-surface-variant">
+                      <v-img
+                        :src="'/api/figures/' + fig"
+                        contain
+                        max-height="450"
+                        class="rounded cursor-pointer"
+                        @click="openImage('/api/figures/' + fig)"
+                      ></v-img>
+                    </div>
                   </v-card>
                 </v-col>
               </v-row>
@@ -659,6 +683,151 @@
       </v-container>
     </v-main>
 
+    <!-- Ollama Models Dialog -->
+    <v-dialog v-model="modelDialog" max-width="720px">
+      <v-card border elevation="0" class="rounded-lg bg-surface">
+        <v-card-title class="d-flex align-center justify-space-between pa-4 border-b">
+          <div class="d-flex align-center font-weight-bold">
+            <v-icon icon="mdi-server-network" color="primary" class="mr-2"></v-icon>
+            Zarządzanie Modelami Ollama (Lokalne LLM)
+          </div>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="modelDialog = false"></v-btn>
+        </v-card-title>
+
+        <v-card-text class="pa-4">
+          <!-- Pull Input Form -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">Pobierz nowy model do lokalnej Ollamy</div>
+          <div class="text-caption text-medium-emphasis mb-3">
+            Wpisz tag modelu z biblioteki ollama.com (np. <code class="px-1 py-0.5 rounded bg-surface-variant font-mono">phi4:latest</code>, <code class="px-1 py-0.5 rounded bg-surface-variant font-mono">deepseek-r1:14b</code>, <code class="px-1 py-0.5 rounded bg-surface-variant font-mono">qwen2.5-coder:14b</code>).
+          </div>
+
+          <v-row dense class="align-center mb-2">
+            <v-col cols="12" sm="8">
+              <v-text-field
+                v-model="modelToPull"
+                placeholder="np. phi4:latest lub mistral-nemo:12b"
+                density="compact"
+                variant="outlined"
+                hide-details
+                prepend-inner-icon="mdi-tag-outline"
+                @keyup.enter="pullModel(modelToPull)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-btn
+                block
+                color="primary"
+                prepend-icon="mdi-download"
+                :loading="pullingModel"
+                :disabled="!modelToPull"
+                @click="pullModel(modelToPull)"
+              >
+                Pobierz model
+              </v-btn>
+            </v-col>
+          </v-row>
+
+          <v-alert
+            v-if="pullStatus"
+            :type="pullStatus.type"
+            density="compact"
+            variant="tonal"
+            class="mb-4 mt-2"
+          >
+            {{ pullStatus.message }}
+          </v-alert>
+
+          <v-divider class="my-4"></v-divider>
+
+          <!-- Recommended Models List -->
+          <div class="d-flex align-center justify-space-between mb-3">
+            <div class="text-subtitle-2 font-weight-bold">
+              Rekomendowane modele dla architektury Roju (RTX 5080 16 GB)
+            </div>
+            <v-btn
+              variant="text"
+              size="small"
+              icon="mdi-refresh"
+              :loading="loadingOllamaModels"
+              @click="fetchOllamaModels"
+              title="Odśwież listę modeli"
+            ></v-btn>
+          </div>
+
+          <v-list density="compact" lines="two" class="bg-surface-variant rounded-lg pa-1 mb-4">
+            <v-list-item
+              v-for="m in recommendedModels"
+              :key="m.name"
+              class="rounded mb-1"
+            >
+              <template #prepend>
+                <v-icon
+                  :icon="isModelInstalled(m.name) ? 'mdi-check-circle' : 'mdi-download-outline'"
+                  :color="isModelInstalled(m.name) ? 'success' : 'medium-emphasis'"
+                  class="mr-2"
+                ></v-icon>
+              </template>
+              <v-list-item-title class="font-weight-bold font-mono text-body-2">
+                {{ m.name }}
+                <v-chip size="x-small" color="primary" variant="outlined" class="ml-2 font-sans font-weight-regular">
+                  {{ m.size }}
+                </v-chip>
+              </v-list-item-title>
+              <v-list-item-subtitle class="text-caption">
+                {{ m.desc }} • <span class="text-medium-emphasis">Rola: {{ m.role }}</span>
+              </v-list-item-subtitle>
+              <template #append>
+                <v-chip
+                  v-if="isModelInstalled(m.name)"
+                  size="small"
+                  color="success"
+                  variant="tonal"
+                >
+                  Zainstalowany
+                </v-chip>
+                <v-btn
+                  v-else
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-download"
+                  :loading="pullingModel && currentPullingName === m.name"
+                  @click="pullModel(m.name)"
+                >
+                  Pobierz
+                </v-btn>
+              </template>
+            </v-list-item>
+          </v-list>
+
+          <!-- Installed Models List -->
+          <div class="text-subtitle-2 font-weight-bold mb-2">
+            Zainstalowane modele w lokalnej Ollamie ({{ installedModels.length }})
+          </div>
+          <div class="d-flex flex-wrap ga-2">
+            <v-chip
+              v-for="name in installedModels"
+              :key="name"
+              size="small"
+              color="accent"
+              variant="tonal"
+              class="font-mono"
+            >
+              <v-icon start icon="mdi-robot"></v-icon>
+              {{ name }}
+            </v-chip>
+            <div v-if="installedModels.length === 0" class="text-caption text-medium-emphasis">
+              Brak wykrytych modeli lub Ollama jest offline.
+            </div>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="pa-4 border-t justify-end">
+          <v-btn variant="text" @click="modelDialog = false">Zamknij</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Global Snackbar -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000" location="bottom right">
       {{ snackbar.text }}
@@ -671,6 +840,73 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 
 const theme = ref('dark')
+const modelDialog = ref(false)
+const modelToPull = ref('')
+const pullingModel = ref(false)
+const currentPullingName = ref('')
+const pullStatus = ref(null)
+const loadingOllamaModels = ref(false)
+const installedModels = ref([])
+const recommendedModels = ref([
+  { name: 'phi4:latest', desc: 'Microsoft Phi-4 (14B) - Logika i wnioskowanie naukowe', role: 'Solver / Jury', size: '9.1 GB' },
+  { name: 'deepseek-r1:14b', desc: 'DeepSeek-R1 (14B) - Rozumowanie łańcuchowe (CoT)', role: "Devil's Advocate", size: '9.0 GB' },
+  { name: 'qwen2.5-coder:14b', desc: 'Qwen 2.5 Coder (14B) - Kod i debugowanie', role: 'Coder / QA Engineer', size: '9.0 GB' },
+  { name: 'mistral-nemo:12b', desc: 'Mistral-NeMo (12B) - Wyszukiwanie i sędzia LLM', role: 'Archivist / Jury', size: '7.1 GB' },
+  { name: 'qwen2.5:14b', desc: 'Qwen 2.5 (14B) - Moderacja dyskusji', role: 'Orchestrator / Critic', size: '9.0 GB' },
+  { name: 'llama3.1:8b', desc: 'Meta Llama 3.1 (8B) - Synteza końcowa', role: 'Secretary', size: '4.7 GB' },
+  { name: 'gemma2:9b', desc: 'Google Gemma 2 (9B) - Ekstrakcja faktów', role: 'Analyst', size: '5.4 GB' }
+])
+
+function isModelInstalled(name) {
+  const norm = (n) => n.includes(':') ? n : `${n}:latest`
+  return installedModels.value.some(m => norm(m) === norm(name) || m.startsWith(name))
+}
+
+async function fetchOllamaModels() {
+  loadingOllamaModels.value = true
+  try {
+    const res = await axios.get('/api/ollama/models')
+    if (res.data) {
+      installedModels.value = res.data.installed || []
+      if (res.data.recommended && res.data.recommended.length > 0) {
+        recommendedModels.value = res.data.recommended
+      }
+    }
+  } catch (err) {
+    console.error('Błąd pobierania modeli Ollama:', err)
+  } finally {
+    loadingOllamaModels.value = false
+  }
+}
+
+function openModelDialog() {
+  modelDialog.value = true
+  pullStatus.value = null
+  fetchOllamaModels()
+}
+
+async function pullModel(name) {
+  if (!name) return
+  pullingModel.value = true
+  currentPullingName.value = name
+  pullStatus.value = { type: 'info', message: `Rozpoczęto pobieranie modelu '${name}' do lokalnej Ollamy. To może potrwać kilka minut...` }
+  try {
+    const res = await axios.post('/api/ollama/pull', { model: name })
+    pullStatus.value = { type: 'success', message: res.data.message || `Model '${name}' został pomyślnie pobrany!` }
+    showToast(`Pobrano model ${name}!`, 'success')
+    await fetchOllamaModels()
+    await fetchData()
+  } catch (err) {
+    pullStatus.value = {
+      type: 'error',
+      message: err.response?.data?.detail || `Błąd podczas pobierania modelu '${name}'`
+    }
+    showToast(`Błąd pobierania ${name}`, 'error')
+  } finally {
+    pullingModel.value = false
+    currentPullingName.value = ''
+  }
+}
 const activeTab = ref('dashboard')
 const selectedProvider = ref('ollama')
 const providers = ['ollama', 'groq', 'openai', 'openrouter']
@@ -795,6 +1031,7 @@ async function fetchData() {
     stats.value = resultsRes.data.statistics || {}
     figuresList.value = figuresRes.data || []
     thesisChapterText.value = chapterRes.data.content || ''
+    await fetchOllamaModels()
     if (!singleTaskResult.value && selectedTaskId.value) {
       await loadTaskResult(selectedTaskId.value)
     }
@@ -930,11 +1167,38 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
+/* Global theme color enforcement */
+.v-application {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+.bg-surface-variant {
+  color: rgb(var(--v-theme-on-surface-variant)) !important;
+}
+
+.bg-surface {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+pre, code, .font-mono {
+  color: inherit !important;
+}
+
 .debate-container {
   scrollbar-width: thin;
 }
+
 .whitespace-pre-wrap {
   white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.figure-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 </style>

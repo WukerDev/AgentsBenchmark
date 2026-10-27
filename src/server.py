@@ -81,7 +81,73 @@ class SingleTaskRequest(BaseModel):
     task_id: str
     provider: Optional[str] = "ollama"
 
+class PullModelRequest(BaseModel):
+    model: str
+
 # ----------------- ENDPOINTS -----------------
+
+@app.get("/api/ollama/models")
+async def get_ollama_models():
+    ollama_base = config.providers.ollama.base_url.replace('/v1', '')
+    installed = []
+    ollama_online = False
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"{ollama_base}/api/tags")
+            if resp.status_code == 200:
+                ollama_online = True
+                data = resp.json()
+                installed = [m["name"] for m in data.get("models", [])]
+    except Exception:
+        ollama_online = False
+
+    recommended = [
+        {"name": "phi4:latest", "desc": "Microsoft Phi-4 (14B) - Logika i wnioskowanie naukowe", "role": "Solver / Fact-Checker / Jury", "size": "9.1 GB"},
+        {"name": "deepseek-r1:14b", "desc": "DeepSeek-R1 (14B) - Rozumowanie łańcuchowe (CoT)", "role": "Devil's Advocate", "size": "9.0 GB"},
+        {"name": "qwen2.5-coder:14b", "desc": "Qwen 2.5 Coder (14B) - Programowanie w Pythonie i debugowanie", "role": "Coder / QA Engineer", "size": "9.0 GB"},
+        {"name": "mistral-nemo:12b", "desc": "Mistral-NeMo (12B) - Wyszukiwanie wewnętrzne i sędzia LLM", "role": "Archivist / Jury", "size": "7.1 GB"},
+        {"name": "qwen2.5:14b", "desc": "Qwen 2.5 (14B) - Moderacja dyskusji i analiza architektury", "role": "Orchestrator / Critic", "size": "9.0 GB"},
+        {"name": "llama3.1:8b", "desc": "Meta Llama 3.1 (8B) - Synteza końcowa i redagowanie odpowiedzi", "role": "Secretary", "size": "4.7 GB"},
+        {"name": "gemma2:9b", "desc": "Google Gemma 2 (9B) - Ekstrakcja faktów i analiza danych", "role": "Analyst", "size": "5.4 GB"}
+    ]
+
+    return {
+        "online": ollama_online,
+        "installed": installed,
+        "recommended": recommended
+    }
+
+@app.post("/api/ollama/pull")
+async def pull_ollama_model(req: PullModelRequest):
+    model_name = req.model.strip()
+    if not model_name:
+        raise HTTPException(status_code=400, detail="Nazwa modelu nie może być pusta")
+
+    ollama_base = config.providers.ollama.base_url.replace('/v1', '')
+    try:
+        async with httpx.AsyncClient(timeout=300.0) as client:
+            resp = await client.post(
+                f"{ollama_base}/api/pull",
+                json={"name": model_name, "stream": False}
+            )
+            if resp.status_code == 200:
+                benchmark_state.broadcast("model_pulled", {"model": model_name, "status": "success"})
+                return {
+                    "status": "success",
+                    "model": model_name,
+                    "message": f"Pomyślnie pobrano model '{model_name}' do lokalnej Ollamy!"
+                }
+            else:
+                raise HTTPException(status_code=resp.status_code, detail=f"Błąd Ollama: {resp.text}")
+    except httpx.ConnectError:
+        raise HTTPException(status_code=503, detail="Nie można połączyć się z lokalną usługą Ollama pod adresem http://localhost:11434. Uruchom serwer Ollama.")
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail=f"Limit czasu pobierania modelu '{model_name}'. Pobieranie może być kontynuowane w tle przez Ollamę.")
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=f"Błąd pobierania modelu: {str(e)}")
+
 
 @app.get("/api/status")
 async def get_status():

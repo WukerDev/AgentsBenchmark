@@ -25,8 +25,14 @@ rich>=13.9.0
 typer>=0.15.0
 colorama>=0.4.6
 
-# Web GUI Dashboard (Interactive testing like OpenCode)
+# Web GUI & API Dashboard (FastAPI + Vue 3 / Vuetify)
+fastapi>=0.115.0
+uvicorn>=0.30.0
 streamlit>=1.42.0
 
 # Reporting & Templates
 jinja2>=3.1.5
+
+# Testing & Quality Assurance
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
