@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_06_relativity - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_06_relativity</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">You are on the equator and running west at the speed the Earth rotates around its own axis. How will your weight change compared to standing still? Will you become lighter, heavier, or will your weight not change?</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">You will become heavier. (Standing on the equator, the Earth's centrifugal force 'throws' you outward, decreasing your weight. By running west at the speed of rotation, you cancel out the Earth's rotational motion relative to the center of the planet, so the centrifugal force disappears -> pressure on the scale increases).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">33.3 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 23.11s | Koszt: $0.0017</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">83.3 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">86.7 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">91.7 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 319.4s | Koszt: $0.0339</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo Model jest błędna, ponieważ zakłada brak zmiany wagi pomimo anulowania efektu siły centrifugalnej przez ruch przeciwny do obrotu Ziemi. To prowadzi do niepoprawnego wniosku, że waga pozostaje taka sama. Z kolei odpowiedź Multi-Agent poprawnie wyjaśnia, jak zmniejszenie prędkości względem centrum Ziemi zwiększa wagę przez redukcję siły centrifugalnej, co jest zgodne z WZORCEM. | [qwen2.5:14b]: Wersja Solo zawiera błędy w interpretacji sił centrifugowych i ich wpływu na wagę. Wersje Multi-Agent poprawnie wyjaśniają, że biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, zmniejsza się wpływ siły centrifugalnej, co prowadzi do wzrostu czujonej masy. | [mistral-nemo:12b]: Odpowiedź B i C są poprawne, ale odpowiedź A jest błędna. Odpowiedzi B i C mają poprawne uzasadnienie, jednak mają drobne nieścisłości w wyjaśnieniu przyczyny zmiany wagi.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: You are on the equator and running west at the speed the Earth rotates around its own axis. How will your weight change compared to standing still? Will you become lighter, heavier, or will your weight not change?
+
+--- Tura 1 (Solo ReAct) ---
+To problem związanego z dynamiką i siłami działającymi na ciało. Kiedy stoisz nieruchomo na równiku, doświadczasz siły grawitacji Ziemi (Twojego "wagi") oraz centrifugowej siły odpychającej skierowanej w dół, która jest spowodowana obrotem Ziemi.
+
+Gdy biegniesz na zachód z prędkością równą prędkości obracania się Ziemi (tzn. dokładnie odpadzasz do jej ruchu), siła odpychająca skierowana w dół jest taka sama jak wcześniej, co oznacza, że ta siła nadal partially neutralizuje siłę grawitacji.
+
+W obu przypadkach (bieganie i stanie) siły centrifugowe są takie same. Zatem, Twoja "waga" (czyli mierzone ciśnienie na skamieniałym wadze) nie ulegnie zmianie. 
+
+ZATWIERDZAM WYNIK: Twój "ważnik" (mierzony przez wadzę) nie ulegnie zmianie, gdy biegniesz na zachód z prędkością równą obracaniu się Ziemi.
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Scientific Fact-Checker (fact_checker)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Aby rozwiązać to zadanie, musimy rozważyć efekty obrotu Ziemi na wagę człowieka.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Przyspieszenie obrotowe**: Ziemski obieg wpływa na wagę poprzez siłę centrifugalną, która działa w kierunku prostopadłym do osi obrotu (w tym przypadku w kierunku ekwatora). Siła ta zmniejsza wagę człowieka.
+
+2. **Prędkość Ziemi**: Przy stałej prędkości obrotowej Ziemi na równiku, prędkość wynosi około 1674 km/h (około 465 m/s).
+
+3. **Ruch przeciwny do obiegu**: Jeśli biegasz z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się.
+
+4. **Efekt na wagę**:
+   - Siła centrifugalna \( F_c \) jest dana przez \( F_c = m \cdot \omega^2 \cdot r \), gdzie \( m \) to masa, \( \omega \) to prędkość kątowa, a \( r \) to promień Ziemi na równiku.
+   - Prędkość względna zmniejsza się, co oznacza obniżenie wartości \( \omega \) w kontekście twojego ruchu względem centrum Ziemi.
+
+5. **Waga**: Waga jest efektem siły grawitacji minus siły centrifugalnej. Zmniejszenie prędkości względem obrotu Ziemi zwiększa skuteczny wpływ siły centrifugalnej, co oznacza zmniejszenie jej przeciwdziałania grawitacji.
+
+Zatem, biegnąc w kierunku zachodnim z prędkością równą prędkości obrotowej Ziemi na równiku, efektywna siła centrifugalna wzrasta, co sprawia, że czujesz się lżejszy. Twoja wagę zmniejsza się w porównaniu do pozostania nieruchomo.
+
+**Podsumowanie**: Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się lżejszy.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Aby rozwiązać problem dotyczący zmiany masy w wyniku biegu na równiku w kierunku przeciwnym do obrotu Ziemi, musimy przeanalizować kilka kluczowych czynników:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Przyspieszenie obrotowe i siła centrifugalna**:
+   - Ziemski obieg powoduje, że na równiku występuje siła centrifugalna, która działa w kierunku prostopadłym do osi obrotu (w tym przypadku wzdłuż promienia Ziemi).
+   - Siła ta zmniejsza wagę człowieka poprzez przeciwdziałanie grawitacji.
+
+2. **Prędkość Ziemi na równiku**:
+   - Prędkość obrotowa Ziemi na równiku wynosi około 1674 km/h (465 m/s).
+
+3. **Ruch przeciwny do obiegu**:
+   - Jeśli biegasz z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się.
+   - Zmniejszenie tej prędkości oznacza obniżenie wartości prędkości kątowej (\( \omega \)) w kontekście twojego ruchu względem centrum Ziemi.
+
+4. **Efekt na wagę**:
+   - Siła centrifugalna \( F_c \) jest dana przez formułę: 
+     \[
+     F_c = m \cdot \omega^2 \cdot r
+     \]
+     gdzie \( m \) to masa, \( \omega \) to prędkość kątowa, a \( r \) to promień Ziemi na równiku.
+   - Zmniejszenie efektywnej prędkości względem obrotu Ziemi oznacza zmniejszenie wartości \( \omega^2 \), co prowadzi do zmniejszenia siły centrifugalnej.
+
+5. **Waga**:
+   - Waga jest wynikiem grawitacji minus efektu siły centrifugalnej.
+   - Zmniejszenie siły centrifugalnej oznacza, że jej przeciwdziałanie grawitacji maleje, co skutkuje zwiększeniem czujonej masy.
+
+Podsumowując:
+
+- Biegnąc na równiku w kierunku zachodnim z prędkością równą prędkości obrotowej Ziemi, efektywna siła centrifugalna zmniejsza się.
+- Zmniejszenie siły centrifugalnej oznacza, że grawitacja ma większy wpływ na twoją wagę.
+- Dlatego czujesz się cięższy w porównaniu do pozostania nieruchomo.
+
+**Podsumowanie**: Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    When running westward on the equator at the same speed as Earth's rotation, the effective angular velocity relative to Earth's center becomes zero. This eliminates the centrifugal force that normally reduces your weight when stationary. As a result, the gravitational force isn't opposed by any centrifugal effect, leading to an increase in apparent weight.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Answer:** You will become heavier.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Scientific Fact-Checker (fact_checker)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Aby rozwiązać problem dotyczący zmiany masy lub wagi podczas biegu na równiku przeciwnie do kierunku obrotu Ziemi, musimy przeanalizować kilka kluczowych czynników:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Przyspieszenie obrotowe i siła centrifugalna**:
+   - Ziemski obieg powoduje występowanie siły centrifugalnej na równiku, która działa w kierunku prostopadłym do osi obrotu (wzdłuż promienia Ziemi).
+   - Ta siła zmniejsza wagę człowieka poprzez przeciwdziałanie grawitacji.
+
+2. **Prędkość Ziemi na równiku**:
+   - Prędkość obrotowa Ziemi na równiku wynosi około 1674 km/h (465 m/s).
+
+3. **Ruch przeciwny do obiegu**:
+   - Biegając z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się.
+   - Zmniejszenie tej prędkości oznacza obniżenie wartości prędkości kątowej (\( \omega \)) w kontekście twojego ruchu względem centrum Ziemi.
+
+4. **Efekt na wagę**:
+   - Siła centrifugalna \( F_c \) jest dana przez formułę: 
+     \[
+     F_c = m \cdot \omega^2 \cdot r
+     \]
+     gdzie \( m \) to masa, \( \omega \) to prędkość kątowa, a \( r \) to promień Ziemi na równiku.
+   - Zmniejszenie efektywnej prędkości względem obrotu Ziemi oznacza zmniejszenie wartości \( \omega^2 \), co prowadzi do zmniejszenia siły centrifugalnej.
+
+5. **Waga**:
+   - Waga jest wynikiem grawitacji minus efektu siły centrifugalnej.
+   - Zmniejszenie siły centrifugalnej oznacza, że jej przeciwdziałanie grawitacji maleje, co skutkuje zwiększeniem czujonej masy.
+
+Podsumowując:
+
+- Biegnąc na równiku w kierunku zachodnim z prędkością równą prędkości obrotowej Ziemi, efektywna siła centrifugalna zmniejsza się.
+- Zmniejszenie siły centrifugalnej oznacza, że grawitacja ma większy wpływ na twoją wagę.
+- Dlatego czujesz się cięższy w porównaniu do pozostania nieruchomo.
+
+**Podsumowanie**: Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Aby rozwiązać problem dotyczący zmiany wagi podczas biegu na równiku przeciwnie do kierunku obrotu Ziemi, przeanalizujmy kluczowe czynniki:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Przyspieszenie obrotowe i siła centrifugalna**:
+   - Ziemski obieg powoduje występowanie siły centrifugalnej na równiku. Ta siła działa w kierunku prostopadłym do osi obrotu (wzdłuż promienia Ziemi) i przeciwdziała grawitacji, zmniejszając wagę człowieka.
+
+2. **Prędkość Ziemi na równiku**:
+   - Prędkość obrotowa Ziemi na równiku wynosi około 1674 km/h (465 m/s).
+
+3. **Ruch przeciwny do obiegu**:
+   - Biegając z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się.
+   - Zmniejszenie tej prędkości oznacza obniżenie wartości prędkości kątowej (\( \omega \)) w kontekście twojego ruchu względem centrum Ziemi.
+
+4. **Efekt na wagę**:
+   - Siła centrifugalna \( F_c \) jest dana przez formułę: 
+     \[
+     F_c = m \cdot \omega^2 \cdot r
+     \]
+     gdzie \( m \) to masa, \( \omega \) to prędkość kątowa, a \( r \) to promień Ziemi na równiku.
+   - Zmniejszenie efektywnej prędkości względem obrotu Ziemi oznacza zmniejszenie wartości \( \omega^2 \), co prowadzi do zmniejszenia siły centrifugalnej.
+
+5. **Waga**:
+   - Waga jest wynikiem grawitacji minus efektu siły centrifugalnej.
+   - Zmniejszenie siły centrifugalnej oznacza, że jej przeciwdziałanie grawitacji maleje, co skutkuje zwiększeniem czujonej masy.
+
+Podsumowując:
+
+- Biegnąc na równiku w kierunku zachodnim z prędkością równą prędkości obrotowej Ziemi, efektywna siła centrifugalna zmniejsza się.
+- Zmniejszenie siły centrifugalnej oznacza, że grawitacja ma większy wpływ na twoją wagę.
+- Dlatego czujesz się cięższy w porównaniu do pozostania nieruchomo.
+
+**Podsumowanie**: Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    When running westward on the equator at the same speed as Earth's rotation, you effectively eliminate the centrifugal force that normally reduces your apparent weight. This results in feeling heavier because the full gravitational force acts upon you without any reduction from the centrifugal effect.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Answer:** You will become heavier.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Scientific Fact-Checker (fact_checker)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Twoja analiza dotycząca zmiany wagi podczas biegu na równiku przeciwnie do kierunku obrotu Ziemi jest poprawna. Przeanalizujmy kluczowe punkty:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Siła centrifugalna**: Na równiku siła grawitacyjna jest nieco zmniejszona przez efekt siły centrifugalnej wynikający z obrotu Ziemi. Ta siła działa w kierunku prostopadłym do osi obrotu (wzdłuż promienia Ziemi) i przeciwdziała grawitacji.
+
+2. **Prędkość Ziemi**: Prędkość obrotowa Ziemi na równiku wynosi około 1674 km/h (465 m/s).
+
+3. **Ruch przeciwny do obiegu**: Biegając z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się do zera.
+
+4. **Efekt na wagę**:
+   - Siła centrifugalna \( F_c \) jest dana przez formułę: 
+     \[
+     F_c = m \cdot \omega^2 \cdot r
+     \]
+     gdzie \( m \) to masa, \( \omega \) to prędkość kątowa, a \( r \) to promień Ziemi na równiku.
+   - Przy zerowej efektywnej prędkości względem obrotu Ziemi (\( \omega = 0 \)), siła centrifugalna również wynosi zero.
+
+5. **Waga**: Waga jest wynikiem grawitacji minus efektu siły centrifugalnej. Bez siły centrifugalnej, pełne działanie grawitacji wpływa na wagę człowieka.
+
+Podsumowując:
+
+- Biegnąc z prędkością obrotu Ziemi w kierunku przeciwnym do jej ruchu, efektywna siła centrifugalna zmniejsza się do zera.
+- Zmniejszenie siły centrifugalnej oznacza, że grawitacja ma większy wpływ na twoją wagę.
+- Dlatego czujesz się cięższy w porównaniu do pozostania nieruchomo.
+
+**Podsumowanie**: Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy. Twoja analiza jest poprawna i zgodna z fizyką.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Aby rozwiązać problem dotyczący zmiany wagi podczas biegu na równiku przeciwnie do kierunku obrotu Ziemi, przeanalizujmy sytuację krok po kroku:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Zrozumienie siły grawitacyjnej i siły centrifugalnej:**
+   - Siła grawitacji to siła pociągająca ciało w stronę centrum Ziemi.
+   - Siła centrifugalna wynika z obrotu Ziemi i działa na ciała znajdujące się na powierzchni Ziemi, oddalając je od osi obrotu. Na równiku ta siła jest maksymalna ze względu na promień Ziemi.
+
+2. **Wpływ siły centrifugalnej na wagę:**
+   - Waga człowieka to efekt netto działania grawitacji i siły centrifugalnej.
+   - Na równiku, gdzie obroty Ziemi są najbardziej wyraźne, siła centrifugalna zmniejsza wagi o około 0.3% w porównaniu do jej wartości bez tej siły.
+
+3. **Prędkość Ziemi na równiku:**
+   - Prędkość obrotowa Ziemi na równiku wynosi około 1674 km/h (465 m/s).
+
+4. **Ruch przeciwny do obiegu Ziemi:**
+   - Biegając z prędkością Ziemi w kierunku zachodnim, efektywna prędkość względem centrum Ziemi zmniejsza się do zera.
+   - W takim przypadku nie ma już dodatkowej siły centrifugalnej wynikającej z ruchu obrotowego Ziemi.
+
+5. **Efekt na wagę:**
+   - Bez efektywnej prędkości względem obrotu Ziemi (\( \omega = 0 \)), siła centrifugalna również wynosi zero.
+   - Waga człowieka jest wówczas całkowicie determinowana przez grawitację, bez redukcji ze strony siły centrifugalnej.
+
+6. **Podsumowanie:**
+   - Biegnąc z prędkością obrotu Ziemi na równiku w kierunku przeciwnym do jej ruchu, efektywna siła centrifugalna zmniejsza się do zera.
+   - Zmniejszenie siły centrifugalnej oznacza, że grawitacja ma większy wpływ na wagę człowieka.
+   - Dlatego czujesz się cięższy w porównaniu do pozostania nieruchomo.
+
+**Ostateczna odpowiedź:** Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy. Pełne działanie grawitacji bez redukcji siły centrifugalnej powoduje tę zmianę.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 mb-2">
+                    Lead Reviewer (critic)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The analysis provided by the Chief Logician is accurate and well-reasoned. The key points are:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Understanding Gravitational Force and Centrifugal Force**: 
+   - Gravitational force pulls an object towards the center of Earth.
+   - Centrifugal force, which arises from the rotation of the Earth, pushes objects away from the axis of rotation. This is maximized at the equator due to its larger radius.
+
+2. **Effect of Centrifugal Force on Weight**:
+   - The weight of an object on Earth's surface is influenced by both gravitational attraction and centrifugal force.
+   - On the equator, where rotational effects are most pronounced, the centrifugal force reduces the effective weight by approximately 0.3%.
+
+3. **Speed of Earth at Equator**: 
+   - The speed of rotation at the equator is about 1674 km/h (465 m/s).
+
+4. **Running Counter to Earth's Rotation**:
+   - Running westward at the same speed as the Earth’s rotational velocity results in an effective zero relative angular velocity.
+   - This means there is no additional centrifugal force due to Earth’s rotation.
+
+5. **Effect on Weight**: 
+   - Without this effective angular velocity, the centrifugal force effectively becomes zero.
+   - The weight of a person is then solely determined by gravitational attraction without any reduction from centrifugal forces.
+
+6. **Conclusion**:
+   - Running westward at the speed of Earth’s rotation on the equator eliminates the centrifugal force.
+   - This results in an increased effective weight due to full gravitational influence without the counteracting centrifugal effect.
+
+The conclusion that you would feel heavier while running westward at the same speed as the Earth's rotational velocity is correct. The solution fully answers the task and has been proven accurate through logical reasoning and physical principles.
+
+**ZATWIERDZAM WYNIK**</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Ostateczna odpowiedź:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Biegnąc z prędkością obrotu Ziemi na równiku w kierunku zachodnim, stajesz się cięższy. Pełne działanie grawitacji bez redukcji siły centrifugalnej powoduje tę zmianę.
+
+Waga Twoja jest wówczas całkowicie determinowana przez grawitację, bez redukcji ze strony siły centrifugalnej.</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

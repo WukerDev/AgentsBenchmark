@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_17_cron_logic - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_17_cron_logic</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">You have a defined CRON job: '*/15 8-16 * * 1-5'. Today is Wednesday, the time is 16:05. When (day of the week, hour, and minute) will the job run next?</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">Next run is on Wednesday, 16:15 (The job runs every 15 minutes between 8:00 and 16:59 due to time-span being inclusive of the last hour).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">25.0 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 16.01s | Koszt: $0.0015</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">91.7 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">91.7 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">91.7 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 175.94s | Koszt: $0.0204</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo Model jest niepoprawna, ponieważ błędnie zakłada, że CRON job nie będzie uruchamiany po godzinie 16:00 tego samego dnia. Zamiast tego, rozważa następny dzień (czwartek), pomijając nadchodzący czas wykonywania w tym samym dniu (środa, 16:15). Odpowiedzi Multi-Agent są poprawne i zgodne ze wzorcem, ponieważ dokładnie określają, że następny czas uruchomienia to środa, 16:15. Solo Model wykazuje halucynację, zakładając niepoprawną interpretację CRON job. | [qwen2.5:14b]: Odpowiedź SOLO jest błędna, ponieważ zignorowano możliwość wykonania zadania w tym samym dniu. Odpowiedzi MULTI-Agent są poprawne i zgodne ze wzorcem. | [mistral-nemo:12b]: Odpowiedź Solo Model - ReAct jest częściowo poprawna, ale błędnie interpretuje czas następnej wykonywanej pracy. Odpowiedzi Multi-Agent są poprawne i zgodne z WZORCEM.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: You have a defined CRON job: '*/15 8-16 * * 1-5'. Today is Wednesday, the time is 16:05. When (day of the week, hour, and minute) will the job run next?
+
+--- Tura 1 (Solo ReAct) ---
+The CRON expression `*/15 8-16 * * 1-5` means the job runs every 15 minutes between 08:00 and 16:00 on weekdays (Monday to Friday).
+
+Today is Wednesday, which is a weekday. The current time is 16:05.
+
+Since it's already past 16:00 today, we need to look at the next day for when this job will run again. Because the CRON expression only runs from Monday to Friday (weekdays), and assuming today is Wednesday, the next available weekday after today would be Thursday.
+
+On Thursday, the earliest time the job can run according to the schedule is 08:00. Therefore, the next execution of this CRON job will be on **Thursday at 08:00**.
+
+ZATWIERDZAM WYNIK: The CRON job will run next on Thursday at 08:00.
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To determine when the CRON job '*/15 8-16 * * 1-5' will run next, we need to break down and analyze its components:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **CRON Expression Breakdown**:
+   - `*/15`: The job runs every 15 minutes.
+   - `8-16`: The job runs between the hours of 08:00 and 16:59.
+   - `*`: The job runs every day of the month.
+   - `*`: The job runs every month.
+   - `1-5`: The job runs on weekdays (Monday to Friday).
+
+2. **Current Context**:
+   - Today is Wednesday, which is a weekday.
+   - The current time is 16:05.
+
+3. **Analysis of Current Time and CRON Schedule**:
+   - Since the current time is 16:05, it falls within the specified hours (08:00 to 16:59).
+   - However, since the job runs every 15 minutes, we need to determine when the next occurrence after 16:05 will be.
+
+4. **Next Occurrence Calculation**:
+   - The job runs at 00, 15, 30, and 45 past each hour.
+   - At 16:05, the most recent run was at 16:00.
+   - Therefore, the next run after 16:05 will be at 16:15.
+
+5. **Day of the Week Consideration**:
+   - Today is Wednesday (a weekday), so 16:15 today is valid for the job to run.
+   - Since 16:15 falls within the specified hours and it's a weekday, this is indeed the next time the job will execute.
+
+6. **Conclusion**:
+   - The CRON job will next run on Wednesday at 16:15.
+
+Thus, the next execution of the job is:
+
+- **Day**: Wednesday
+- **Hour**: 16
+- **Minute**: 15</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The CRON job will run next on Wednesday at 16:15.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Step-by-Step Explanation:**
+
+1. **CRON Expression Breakdown:**
+   - `*/15`: Runs every 15 minutes.
+   - `8-16`: Runs from 8 AM to 4 PM (up to 16:59).
+   - `* * 1-5`: Runs Monday through Friday.
+
+2. **Current Time and Day:**
+   - Wednesday at 16:05, which is within the allowed hours and a weekday.
+
+3. **Next Execution Calculation:**
+   - Last run was at 16:00.
+   - Next run will be at 16:15 as it's the next 15-minute interval after 16:05.
+
+**Answer:**  
+The CRON job will run next on Wednesday at 16:15.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To determine when the CRON job '*/15 8-16 * * 1-5' will run next given that today is Wednesday and the current time is 16:05, we need to analyze each component of the CRON expression and apply it to the current context.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Step-by-Step Analysis:
+
+1. **CRON Expression Breakdown**:
+   - `*/15`: This indicates the job runs every 15 minutes.
+   - `8-16`: The job is scheduled to run between 08:00 and 16:59 each day.
+   - `* *`: These fields indicate that the job runs every day of the month and every month, respectively.
+   - `1-5`: This specifies that the job only runs on weekdays (Monday through Friday).
+
+2. **Current Context**:
+   - Today is Wednesday, which falls within the range of 1 to 5 for weekdays.
+   - The current time is 16:05.
+
+3. **Analysis of Current Time and CRON Schedule**:
+   - Since today is a weekday (Wednesday) and the current hour (16) is within the specified range (8-16), we need to determine when the next execution will occur based on the minute interval.
+   - The job runs at 00, 15, 30, and 45 past each hour.
+
+4. **Next Occurrence Calculation**:
+   - At 16:05, the most recent run was at 16:00.
+   - Therefore, the next scheduled time for the job to run is at 16:15.
+
+5. **Conclusion**:
+   - Since today is Wednesday and it's currently 16:05, the next execution of the CRON job will occur on the same day at 16:15.
+
+### Final Answer:
+
+- **Day**: Wednesday
+- **Hour**: 16
+- **Minute**: 15
+
+The CRON job will run next on Wednesday at 16:15.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The CRON job will next run on Wednesday at 16:15.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Answer:**  
+The CRON job will run next on Wednesday at 16:15.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To determine when the CRON job '*/15 8-16 * * 1-5' will run next given that today is Wednesday and the current time is 16:05, let's break down the problem step-by-step:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Step-by-Step Analysis
+
+1. **Understanding the CRON Expression**:
+   - `*/15`: This specifies that the job runs every 15 minutes.
+   - `8-16`: The job runs from 08:00 to 16:59 each day.
+   - `* *`: These fields indicate that the job runs every day of the month and every month, respectively.
+   - `1-5`: This specifies that the job only runs on weekdays (Monday through Friday).
+
+2. **Current Context**:
+   - Today is Wednesday, which is a weekday within the range specified by `1-5`.
+   - The current time is 16:05.
+
+3. **Determining the Next Execution Time**:
+   - Since today is a valid day for execution and the current hour (16) falls within the allowed hours (8 to 16), we focus on the minute interval.
+   - The job runs at 00, 15, 30, and 45 past each hour.
+
+4. **Calculating the Next Run**:
+   - At 16:05, the most recent execution was at 16:00.
+   - Therefore, the next scheduled time for the job to run is at 16:15.
+
+5. **Conclusion**:
+   - Given that today is Wednesday and it's currently 16:05, the next execution of the CRON job will occur on the same day at 16:15.
+
+### Final Answer
+
+- **Day**: Wednesday
+- **Hour**: 16
+- **Minute**: 15
+
+The CRON job will run next on Wednesday at 16:15.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 mb-2">
+                    Lead Reviewer (critic)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The solution provided is correct and fully answers the task. The CRON job '*/15 8-16 * * 1-5' will indeed run next on Wednesday at 16:15 given that today is Wednesday and the current time is 16:05.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**ZATWIERDZAM WYNIK**</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    **Final Answer**
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">The CRON job will run next on Wednesday at 16:15.
+
+- **Day**: Wednesday
+- **Hour**: 16
+- **Minute**: 15</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

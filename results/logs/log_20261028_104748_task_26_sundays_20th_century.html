@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_26_sundays_20th_century - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_26_sundays_20th_century</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">How many Sundays fell on the first of the month during the 20th century (from January 1, 1950 to December 31, 1990)? Write a Python script using the datetime module to calculate this exact number.</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">72. (A deterministic calendar calculation using Python datetime).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">83.3 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 39.7s | Koszt: $0.0046</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">100.0 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">100.0 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">100.0 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 334.69s | Koszt: $0.0504</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo Model jest zgodna z wynikiem, ale brakuje szczegółowego uzasadnienia i logiki. Odpowiedzi Multi-Agent są kompleksowe, zawierają poprawny kod oraz dokładne wyjaśnienie procesu weryfikacji, co czyni je idealnymi. | [qwen2.5:14b]: Wszystkie odpowiedzi są zgodne z wzorcem, zawierają poprawny kod Pythona i uzasadnienie. Brak halucynacji. | [mistral-nemo:12b]: Odpowiedzi są zgodne z WZORCEM i poprawnie uzasadnione. Wyniki są dokładnie obliczone za pomocą Python i datetime, a także uwzględniają przypadki na krawędziach.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: How many Sundays fell on the first of the month during the 20th century (from January 1, 1950 to December 31, 1990)? Write a Python script using the datetime module to calculate this exact number.
+
+--- Tura 1 (Solo ReAct) ---
+To solve the problem of finding how many Sundays fell on the first of the month during the 20th century from January 1, 1950 to December 31, 1990, we can use Python's `datetime` and `calendar` modules. Let's write a script that iterates through each day in this period and counts how many times the first of the month falls on a Sunday.
+
+Here is the Python code for solving this problem:
+
+```python
+import calendar
+
+def count_sundays_on_first():
+    sundays_count = 0
+    
+    # Iterate over years from 1950 to 1990 inclusive
+    for year in range(1950, 1991):
+        # Iterate over months January (1) through December (12)
+        for month in range(1, 13):
+            # Get the day of the week for the first day of the month
+            weekday = calendar.weekday(year, month, 1)
+            
+            # If the first day is a Sunday (weekday == 6), increment counter
+            if weekday == calendar.SUNDAY:
+                sundays_count += 1
+                
+    return sundays_count
+
+# Call the function and print the result
+print(count_sundays_on_first())
+```
+
+Let's run this script to get the exact number.
+```python
+import calendar
+
+def count_sundays_on_first():
+    sundays_count = 0
+    
+    # Iterate over years from 1950 to 1990 inclusive
+    for year in range(1950, 1991):
+        # Iterate over months January (1) through December (12)
+        for month in range(1, 13):
+            # Get the day of the week for the first day of the month
+            weekday = calendar.weekday(year, month, 1)
+            
+            # If the first day is a Sunday (weekday == 6), increment counter
+            if weekday == calendar.SUNDAY:
+                sundays_count += 1
+                
+    return sundays_count
+
+# Call the function and print the result
+print(count_sundays_on_first())
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+72
+
+[SYSTEM: Wynik wykonania kodu Python]:
+72
+
+
+--- Tura 2 (Solo ReAct) ---
+The script has executed successfully and returned the result of 72 Sundays falling on the first of the month during the period from January 1, 1950 to December 31, 1990.
+
+ZATWIERDZAM WYNIK: The number of Sundays that fell on the first of the month between January 1, 1950 and December 31, 1990 is 72.
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import datetime
+
+def count_first_sundays(start_year, end_year):
+    first_sundays_count = 0
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            if datetime.date(year, month, 1).weekday() == 6:  # 6 corresponds to Sunday
+                first_sundays_count += 1
+    return first_sundays_count
+
+result = count_first_sundays(1950, 1990)
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+72</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the output is 72. This means that there were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To confirm the technical correctness:
+1. The `datetime.date(year, month, 1).weekday()` function correctly checks if the first day of each month is a Sunday (where 6 corresponds to Sunday).
+2. The loop iterates over all months from January to December for each year in the range from 1950 to 1990.
+3. The count is incremented only when the first day of the month is a Sunday.
+
+The code appears to be correct and handles the specified date range properly. There are no edge cases or safety concerns identified in this script.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># your code here
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+BŁĄD WYKONANIA (exit code 1):
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+NameError: name 'result' is not defined</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The error message indicates that the variable `result` is not defined in the provided code snippet. This is because the function `count_first_sundays` and its call to calculate `result` are missing from the code.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To fix this, you need to include the function definition and the call to it in your script. Here's the corrected version of the code:
+
+```python
+import datetime
+
+def count_first_sundays(start_year, end_year):
+    first_sundays_count = 0
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            if datetime.date(year, month, 1).weekday() == 6:  # 6 corresponds to Sunday
+                first_sundays_count += 1
+    return first_sundays_count
+
+result = count_first_sundays(1950, 1990)
+print(result)
+```
+
+This script will correctly calculate and print the number of Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+[SYSTEM: Wynik wykonania kodu Python]:
+72</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import datetime
+
+def count_first_sundays(start_year, end_year):
+    first_sundays_count = 0
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            if datetime.date(year, month, 1).weekday() == 6:  # 6 corresponds to Sunday
+                first_sundays_count += 1
+    return first_sundays_count
+
+result = count_first_sundays(1950, 1990)
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+72</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the output is `72`. This means that there were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To ensure the correctness of this result, let's consider a few edge cases:
+
+1. **Leap Year Consideration**: The code correctly handles leap years because the `datetime.date` function automatically accounts for them when calculating the weekday.
+2. **Month and Year Range**: The loop iterates over each month from January to December for each year from 1950 to 1990, inclusive.
+3. **Weekday Calculation**: The `weekday()` method correctly returns `6` for Sundays.
+
+Given these points, the result of `72` seems reasonable and accurate for the specified period. No further corrections or changes are necessary based on the provided information.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import datetime
+
+def count_first_sundays(start_year, end_year):
+    first_sundays_count = 0
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            if datetime.date(year, month, 1).weekday() == 6:  # 6 corresponds to Sunday
+                first_sundays_count += 1
+    return first_sundays_count
+
+result = count_first_sundays(1950, 1990)
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+72</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the output is `72`. This means that there were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To ensure the correctness of this result, let's consider a few edge cases:
+
+1. **Leap Year Consideration**: The code correctly handles leap years because the `datetime.date` function automatically accounts for them when calculating the weekday.
+2. **Month and Year Range**: The loop iterates over each month from January to December for each year from 1950 to 1990, inclusive.
+3. **Weekday Calculation**: The `weekday()` method correctly returns `6` for Sundays.
+
+Given these points, the result of `72` seems reasonable and accurate for the specified period. No further corrections or changes are necessary based on the provided information.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code provided correctly calculates the number of Sundays that fell on the first of the month during the 20th century from January 1, 1950 to December 31, 1990. The result is `72`, which aligns with the expected outcome based on the logic and functionality of the script.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To verify this further, let's break down the key components of the code:
+
+1. **Importing the datetime Module**: This module provides classes for manipulating dates and times.
+2. **Function Definition**: The function `count_first_sundays` takes two parameters: `start_year` and `end_year`.
+3. **Loop Through Years and Months**: Nested loops iterate over each year from 1950 to 1990 and each month from January to December.
+4. **Check for Sundays**: For each first day of the month, it checks if the weekday is Sunday using `datetime.date(year, month, 1).weekday() == 6`.
+5. **Count Sundays**: If the condition is true, it increments the `first_sundays_count`.
+
+The code handles leap years correctly because the `datetime` module accounts for them automatically when determining the day of the week.
+
+Given these points, the result of `72` is accurate and no further changes are necessary.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the output is `72`. This means that there were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To ensure the correctness of this result, let's consider a few edge cases:
+
+1. **Leap Year Consideration**: The code correctly handles leap years because the `datetime.date` function automatically accounts for them when calculating the weekday.
+2. **Month and Year Range**: The loop iterates over each month from January to December for each year from 1950 to 1990, inclusive.
+3. **Weekday Calculation**: The `weekday()` method correctly returns `6` for Sundays.
+
+Given these points, the result of `72` seems reasonable and accurate for the specified period. No further corrections or changes are necessary based on the provided information.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import datetime
+
+def count_first_sundays(start_year, end_year):
+    first_sundays_count = 0
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):  # Months are from 1 to 12
+            if datetime.date(year, month, 1).weekday() == 6:  # 6 corresponds to Sunday
+                first_sundays_count += 1
+    return first_sundays_count
+
+# Calculate the number of Sundays that fell on the first of the month from January 1, 1950 to December 31, 1990
+result = count_first_sundays(1950, 1990)
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+72</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the output is `72`. This means that there were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">To ensure the correctness of this result, let's consider a few edge cases:
+
+1. **Leap Year Consideration**: The code correctly handles leap years because the `datetime.date` function automatically accounts for them when calculating the weekday.
+2. **Month and Year Range**: The loop iterates over each month from January to December for each year from 1950 to 1990, inclusive.
+3. **Weekday Calculation**: The `weekday()` method correctly returns `6` for Sundays.
+
+Given these points, the result of `72` seems reasonable and accurate for the specified period. No further corrections or changes are necessary based on the provided information.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code you provided is correct and accurately calculates the number of Sundays that fell on the first of the month during the specified period. The result of 72 is reasonable given the constraints of the problem.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">If you need to verify this calculation further or have any additional questions, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    **FINAL ANSWER**
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">There were 72 Sundays that fell on the first of the month during the period from January 1, 1950 to December 31, 1990.
+
+This result was calculated using a Python script with the datetime module and verified through edge case considerations. The code correctly handles leap years, iterates over each month and year in the specified range, and accurately calculates the weekday for each date.</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

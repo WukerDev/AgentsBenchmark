@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_09_logic_grid - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_09_logic_grid</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">Adam, Bogdan, and Cezary are: a programmer, a graphic designer, and a tester (in no particular order). If Adam is a programmer, then Bogdan is a graphic designer. If Adam is a graphic designer, then Bogdan is a tester. If Bogdan is not a programmer, then Cezary is a graphic designer. Who is Adam?</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">Adam is a tester. (Requires mapping out a truth table. The Coder can write a script checking all permutations).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">41.7 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 25.72s | Koszt: $0.0019</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">83.3 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">83.3 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">100.0 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 296.91s | Koszt: $0.0281</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo Model jest błędna, ponieważ niepoprawnie wniosła, że Adam jest programistą. Analiza w Tury 5 poprawnie zidentyfikowała możliwe scenariusze i wykluczyła te prowadzące do sprzeczności, co doprowadziło do prawidłowego wniosku, że Adam jest testerem. Ostateczna odpowiedź Multi-Agent w Turze 10 poprawnie zidentyfikowała, że jedynym rozwiązaniem bez sprzeczności jest, gdy Adam jest testerem. | [qwen2.5:14b]: Odpowiedź w Multi-Agent - Finał jest zgodna z prawidłowym rozumowaniem i spełnia wszystkie warunki zadania. | [mistral-nemo:12b]: W odpowiedzi A, uzasadnienie jest poprawne, ale nie jest zupełnie precyzyjne. W odpowiedziach B, C i D, uzasadnienia są zupełnie poprawne i precyzyjne.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: Adam, Bogdan, and Cezary are: a programmer, a graphic designer, and a tester (in no particular order). If Adam is a programmer, then Bogdan is a graphic designer. If Adam is a graphic designer, then Bogdan is a tester. If Bogdan is not a programmer, then Cezary is a graphic designer. Who is Adam?
+
+--- Tura 1 (Solo ReAct) ---
+Aby rozwiązać to zadanie logiki, nie potrzebujemy używać żadnych specjalnych narzędzi. Możemy to zrobić za pomocą dedukcji.
+
+Oto co wiemy:
+1. Adam jest programistą lub grafiką.
+2. Jeśli Adam jest programistą, Bogdan jest grafiką.
+3. Jeśli Adam jest grafiką, Bogdan jest testerem.
+4. Jeśli Bogdan nie jest programistą, Cezary jest grafiką.
+
+Z punktów 1 i 2, jeśli Adam jest programistą, to Bogdan musi być grafiką, a Cezary testerem (ponieważ każdy z nich ma swoją rolę).
+
+Z punktu 3, jeśli Adam jest grafiką, to Bogdan jest testerem. W takim przypadku, Cezary musi być programistą (ponieważ każdy z nich ma swoją rolę i nie może dwóch osób mieć tej samej roli).
+
+Teraz, z punktu 4, jeśli Bogdan nie jest programistą, to Cezary jest grafiką. To oznacza, że Adam nie może być grafiką, ponieważ wtedy Bogdan byłby testerem (z punktu 3) i Cezary byłby grafiką, co prowadziłoby do kontradykcji z tym, że każdy ma swoją rolę.
+
+Stąd wnioskujemy, że Adam jest programistą. To oznacza, że Bogdan jest grafiką (z punktu 2) i Cezary jest testerem.
+
+ZATWIERDZAM WYNIK: Adam jest programistą.
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To solve the problem of determining who Adam is among the roles of programmer, graphic designer, and tester, we need to analyze the given conditions step by step:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **Identify the Conditions:**
+   - If Adam is a programmer, then Bogdan is a graphic designer.
+   - If Adam is a graphic designer, then Bogdan is a tester.
+   - If Bogdan is not a programmer, then Cezary is a graphic designer.
+
+2. **Consider Each Possibility for Adam's Role:**
+
+   - **Case 1: Adam is the Programmer**
+     - From the first condition, if Adam is the programmer, then Bogdan must be the graphic designer.
+     - This leaves Cezary to be the tester (since each person has a unique role).
+     - Check the third condition: If Bogdan is not a programmer, then Cezary is a graphic designer. However, in this scenario, Bogdan is a graphic designer, so the condition does not apply directly.
+     - This case holds without contradiction.
+
+   - **Case 2: Adam is the Graphic Designer**
+     - From the second condition, if Adam is the graphic designer, then Bogdan must be the tester.
+     - This leaves Cezary to be the programmer.
+     - Check the third condition: If Bogdan is not a programmer (which he isn't in this case), then Cezary is a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+     - Therefore, this case does not hold.
+
+   - **Case 3: Adam is the Tester**
+     - If Adam is the tester, we need to determine Bogdan's and Cezary's roles based on the remaining conditions.
+     - From the third condition, if Bogdan is not a programmer, then Cezary is a graphic designer. Since Adam is the tester, Bogdan could either be the programmer or the graphic designer.
+     - If Bogdan were the graphic designer, then Cezary would have to be the programmer (since each role must be filled uniquely).
+     - Check the third condition: If Bogdan is not a programmer (which he isn't in this scenario), then Cezary should be a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+     - Therefore, this case does not hold.
+
+3. **Conclusion:**
+   - The only consistent scenario without contradictions is when Adam is the Programmer, Bogdan is the Graphic Designer, and Cezary is the Tester.
+
+Thus, based on the logical analysis of the conditions provided:
+
+- **Adam is the Programmer.**</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    **Step-by-Step Explanation:**
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">1. **List the Roles:** We have three roles—programmer, graphic designer, and tester—to assign to Adam, Bogdan, and Cezary.
+
+2. **Analyze Each Condition:**
+   - **Condition 1:** If Adam is a programmer, Bogdan must be a graphic designer.
+   - **Condition 2:** If Adam is a graphic designer, Bogdan must be a tester.
+   - **Condition 3:** If Bogdan isn't a programmer, Cezary must be a graphic designer.
+
+3. **Test Each Possibility for Adam:**
+   - **Case 1: Adam is the Programmer**
+     - From Condition 1, Bogdan is the graphic designer.
+     - This leaves Cezary as the tester.
+     - Check Condition 3: Since Bogdan isn't a programmer (he's a graphic designer), Cezary should be a graphic designer. Contradiction because Cezary is the tester.
+
+   - **Case 2: Adam is the Graphic Designer**
+     - From Condition 2, Bogdan is the tester.
+     - This leaves Cezary as the programmer.
+     - Check Condition 3: Since Bogdan isn't a programmer (he's a tester), Cezary should be a graphic designer. Contradiction because Cezary is the programmer.
+
+   - **Case 3: Adam is the Tester**
+     - Now, determine Bogdan and Cezary's roles.
+     - If Bogdan is the programmer:
+       - From Condition 3, since Bogdan isn't a programmer (he is), no requirement on Cezary. Thus, Cezary can be the graphic designer without contradiction.
+
+4. **Conclusion:**
+   - The only scenario without contradictions is when Adam is the tester, Bogdan is the programmer, and Cezary is the graphic designer.
+
+**Answer:**  
+Adam is the **tester**.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To determine who Adam is among the roles of programmer, graphic designer, and tester, we need to analyze the given conditions systematically:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Conditions:
+1. If Adam is a programmer, then Bogdan is a graphic designer.
+2. If Adam is a graphic designer, then Bogdan is a tester.
+3. If Bogdan is not a programmer, then Cezary is a graphic designer.
+
+### Analyzing Each Possibility for Adam's Role:
+
+#### Case 1: Adam is the Programmer
+- **From Condition 1:** If Adam is the programmer, then Bogdan must be the graphic designer.
+- This leaves Cezary to be the tester (since each person has a unique role).
+- **Check Condition 3:** Since Bogdan is not a programmer (he's a graphic designer), according to this condition, Cezary should be a graphic designer. However, in this scenario, Cezary is the tester, so there is no contradiction here because the condition does not apply directly when Bogdan is a graphic designer.
+- **Conclusion for Case 1:** This case holds without contradictions.
+
+#### Case 2: Adam is the Graphic Designer
+- **From Condition 2:** If Adam is the graphic designer, then Bogdan must be the tester.
+- This leaves Cezary to be the programmer.
+- **Check Condition 3:** Since Bogdan is not a programmer (he's a tester), according to this condition, Cezary should be a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+- **Conclusion for Case 2:** This case does not hold due to contradiction.
+
+#### Case 3: Adam is the Tester
+- If Adam is the tester, we need to determine Bogdan's and Cezary's roles based on the remaining conditions.
+- **From Condition 3:** If Bogdan is not a programmer, then Cezary must be a graphic designer. Since Adam is the tester, Bogdan could either be the programmer or the graphic designer.
+  - **Sub-case 3a: Bogdan is the Programmer**
+    - This leaves Cezary to be the graphic designer.
+    - **Check Condition 3:** Since Bogdan is a programmer, this condition does not apply directly. There are no contradictions here.
+  - **Sub-case 3b: Bogdan is the Graphic Designer**
+    - This leaves Cezary to be the programmer.
+    - **Check Condition 3:** Since Bogdan is not a programmer (he's a graphic designer), according to this condition, Cezary should be a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+- **Conclusion for Case 3:** Only sub-case 3a holds without contradictions.
+
+### Conclusion:
+- The consistent scenarios are when Adam is either the Programmer (Case 1) or the Tester with Bogdan as the Programmer and Cezary as the Graphic Designer (Sub-case 3a).
+- However, upon reviewing the logical flow and ensuring all conditions are satisfied without contradiction, Case 1 emerges as the most straightforward solution.
+
+Thus, based on the logical analysis of the conditions provided:
+
+- **Adam is the Programmer.**</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 mb-2">
+                    Devil's Advocate (devil)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    **Odpowiedź:**
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Adam jest **testerem**.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    Chief Logician (solver)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To determine who Adam is among the roles of programmer, graphic designer, and tester, we need to analyze the given conditions systematically:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Conditions:
+1. If Adam is a programmer, then Bogdan is a graphic designer.
+2. If Adam is a graphic designer, then Bogdan is a tester.
+3. If Bogdan is not a programmer, then Cezary is a graphic designer.
+
+### Analyzing Each Possibility for Adam's Role:
+
+#### Case 1: Adam is the Programmer
+- **From Condition 1:** If Adam is the programmer, then Bogdan must be the graphic designer.
+- This leaves Cezary to be the tester (since each person has a unique role).
+- **Check Condition 3:** Since Bogdan is not a programmer (he's a graphic designer), according to this condition, Cezary should be a graphic designer. However, in this scenario, Cezary is the tester, so there is no contradiction here because the condition does not apply directly when Bogdan is a graphic designer.
+- **Conclusion for Case 1:** This case holds without contradictions.
+
+#### Case 2: Adam is the Graphic Designer
+- **From Condition 2:** If Adam is the graphic designer, then Bogdan must be the tester.
+- This leaves Cezary to be the programmer.
+- **Check Condition 3:** Since Bogdan is not a programmer (he's a tester), according to this condition, Cezary should be a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+- **Conclusion for Case 2:** This case does not hold due to contradiction.
+
+#### Case 3: Adam is the Tester
+- If Adam is the tester, we need to determine Bogdan's and Cezary's roles based on the remaining conditions.
+- **From Condition 3:** If Bogdan is not a programmer, then Cezary must be a graphic designer. Since Adam is the tester, Bogdan could either be the programmer or the graphic designer.
+  - **Sub-case 3a: Bogdan is the Programmer**
+    - This leaves Cezary to be the graphic designer.
+    - **Check Condition 3:** Since Bogdan is a programmer, this condition does not apply directly. There are no contradictions here.
+  - **Sub-case 3b: Bogdan is the Graphic Designer**
+    - This leaves Cezary to be the programmer.
+    - **Check Condition 3:** Since Bogdan is not a programmer (he's a graphic designer), according to this condition, Cezary should be a graphic designer. However, here Cezary is the programmer, which contradicts the condition.
+- **Conclusion for Case 3:** Only sub-case 3a holds without contradictions.
+
+### Conclusion:
+- The consistent scenarios are when Adam is either the Programmer (Case 1) or the Tester with Bogdan as the Programmer and Cezary as the Graphic Designer (Sub-case 3a).
+- However, upon reviewing the logical flow and ensuring all conditions are satisfied without contradiction, Case 1 emerges as the most straightforward solution.
+
+Thus, based on the logical analysis of the conditions provided:
+
+- **Adam is the Tester.**
+
+This conclusion aligns with the devil's advocate perspective that Adam must be the tester to satisfy all given conditions without contradictions.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 mb-2">
+                    Lead Reviewer (critic)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The final solution provided by the Chief Logician states that Adam is the tester. However, this conclusion contradicts the initial analysis where Case 1 was found to be consistent and free of contradictions (Adam being a programmer). Let's re-evaluate:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Re-Evaluation:
+- **Case 1: Adam is the Programmer**
+  - Bogdan must be the graphic designer.
+  - Cezary must be the tester.
+  - Condition 3 does not apply directly as Bogdan is a graphic designer, so there are no contradictions here.
+
+- **Case 2: Adam is the Graphic Designer**
+  - Bogdan must be the tester.
+  - Cezary must be the programmer.
+  - This contradicts Condition 3 because if Bogdan is a tester (not a programmer), then Cezary should be a graphic designer, but he's the programmer.
+
+- **Case 3: Adam is the Tester**
+  - Bogdan could either be the Programmer or Graphic Designer.
+    - Sub-case 3a: Bogdan is the Programmer
+      - Cezary must be the Graphic Designer (Condition 3 holds as Bogdan is a programmer).
+    - Sub-case 3b: Bogdan is the Graphic Designer
+      - This contradicts Condition 3 because if Bogdan is not a programmer, then Cezary should be a graphic designer but he's the programmer.
+
+### Conclusion:
+- Only Case 1 (Adam being the Programmer) and Sub-case 3a (Adam being the Tester with Bogdan as the Programmer and Cezary as the Graphic Designer) are consistent.
+- However, Sub-case 3a is not fully aligned with all conditions without contradictions. Therefore, the most straightforward solution that satisfies all given conditions is:
+
+**Case 1: Adam is the Programmer**
+
+Thus, based on a thorough re-evaluation:
+- **Adam is the Programmer.**
+
+This aligns with initial analysis and ensures no contradictions.
+
+ZATWIERDZAM WYNIK</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    **Ostateczna odpowiedź:**
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Adam jest **programistą**.
+
+**Uzasadnienie:** 
+Po przestudiowaniu warunków i analizie wszystkich możliwości dla roli Adama, wynika że jedynym rozwiązaniem zgodnym z warunkami jest to, że Adam jest programistą.</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

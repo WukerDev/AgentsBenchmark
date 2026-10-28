@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_32_knapsack_optimization - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_32_knapsack_optimization</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">You have a backpack with a maximum capacity of 15 kg. You have 5 items with (weight, value): Item 1 (4kg, $30), Item 2 (5kg, $40), Item 3 (7kg, $70), Item 4 (3kg, $20), Item 5 (6kg, $50). Write a Python script implementing the 0/1 Knapsack dynamic programming algorithm to calculate the maximum achievable value and which items should be packed.</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">Maximum value: $140. Selected items: Item 1 (4kg, $30), Item 2 (5kg, $40), Item 3 (7kg, $70). Total weight: 16kg is invalid -> Optimal combination is Item 1 (4kg), Item 2 (5kg), Item 5 (6kg) giving 15kg and $120 OR Item 1 (4kg), Item 3 (7kg), Item 4 (3kg) giving 14kg and $120. Total maximum value is $120.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">41.7 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 56.04s | Koszt: $0.0059</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">91.7 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">100.0 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">100.0 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 516.17s | Koszt: $0.0697</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo Model zawiera błędne wyniki i niepoprawnie interpretuje wyjście, sugerując maksymalną wartość $130 z niewłaściwymi elementami. Odpowiedzi Multi-Agent są poprawne, zgodne z WZORCEM, pokazując maksymalną wartość $120 i poprawne zestawy elementów. | [qwen2.5:14b]: Odpowiedź SOLO zawiera niepoprawne informacje o wadze i wartościach wybranych przedmiotów, co prowadzi do błędnego wyniku. Odpowiedzi MULTI-Agent są poprawne i zgodne z WZORCEM. | [mistral-nemo:12b]: Odpowiedzi są zgodne z WZORCEM, uzasadnienie jest precyzyjne i poprawne.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: You have a backpack with a maximum capacity of 15 kg. You have 5 items with (weight, value): Item 1 (4kg, $30), Item 2 (5kg, $40), Item 3 (7kg, $70), Item 4 (3kg, $20), Item 5 (6kg, $50). Write a Python script implementing the 0/1 Knapsack dynamic programming algorithm to calculate the maximum achievable value and which items should be packed.
+
+--- Tura 1 (Solo ReAct) ---
+To solve the 0/1 Knapsack problem using dynamic programming, we need to create a table that stores the maximum value for every possible weight from 0 up to the capacity of the backpack (15 kg in this case). The dimensions of our table will be number_of_items + 1 by knapsack_capacity + 1. Each cell [i][w] represents the maximum value we can achieve with the first i items and a total weight not exceeding w.
+
+Let's implement this algorithm in Python.
+```python
+def knapsack(weights, values, capacity):
+    n = len(values)
+    
+    # Create a table to store results of subproblems
+    dp = [[0 for x in range(capacity + 1)] for x in range(n + 1)]
+ 
+    # Build table dp[][] in bottom up manner
+    for i in range(1, n + 1):
+        for w in range(1, capacity + 1):
+            if weights[i-1] <= w:
+                dp[i][w] = max(values[i-1] + dp[i-1][w-weights[i-1]], dp[i-1][w])
+            else:
+                dp[i][w] = dp[i-1][w]
+ 
+    # Determine which items are included in the optimal solution
+    selected_items = []
+    w = capacity
+    for i in range(n, 0, -1):
+        if dp[i][w] != dp[i-1][w]:
+            selected_items.append(i)
+            w -= weights[i-1]
+ 
+    return dp[n][capacity], selected_items
+
+weights = [4, 5, 7, 3, 6]
+values = [30, 40, 70, 20, 50]
+max_value, items_selected = knapsack(weights, values, 15)
+print("Maximum achievable value:", max_value)
+print("Selected items (index starts from 1):", items_selected)
+```
+This script calculates the maximum achievable value and determines which items should be packed to achieve this value. The indices of selected items start from 1.
+
+Let's run the code.
+```python
+weights = [4, 5, 7, 3, 6]
+values = [30, 40, 70, 20, 50]
+max_value, items_selected = knapsack(weights, values, 15)
+print("Maximum achievable value:", max_value)
+print("Selected items (index starts from 1):", items_selected)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Selected items (index starts from 1): [4, 3, 2]
+
+[SYSTEM: Wynik wykonania kodu Python]:
+BŁĄD WYKONANIA (exit code 1):
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+NameError: name 'knapsack' is not defined
+
+
+--- Tura 2 (Solo ReAct) ---
+It seems there was an error because the function `knapsack` wasn't recognized in the environment where the script was run. However, I can confirm that the provided Python code is correct and should work as expected when executed properly.
+
+The output indicates:
+- The maximum achievable value with a 15 kg capacity backpack is $130.
+- The selected items to achieve this value are Item 4, Item 3, and Item 2 (based on their indices starting from 1).
+
+Since the function definition was provided correctly in the initial script, let's manually verify the result by mapping back the selected item indices to their corresponding weights and values.
+
+Selected items: Index 4 -> Weight = 3kg, Value = $20
+                Index 3 -> Weight = 7kg, Value = $70
+                Index 2 -> Weight = 5kg, Value = $40
+
+Total weight = 3 + 7 + 5 = 15 kg (within the capacity)
+Total value = $20 + $70 + $40 = $130
+
+This confirms that the solution is correct. Therefore, I can conclude:
+
+ZATWIERDZAM WYNIK: The maximum achievable value with a 15 kg capacity backpack is $130 by selecting items 4, 3, and 2 (based on their indices starting from 1).
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">def knapsack(weights, values, capacity):
+    n = len(weights)
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+
+    # Build table dp[][] in bottom up manner
+    for i in range(1, n + 1):
+        for w in range(1, capacity + 1):
+            if weights[i-1] <= w:
+                dp[i][w] = max(values[i-1] + dp[i-1][w-weights[i-1]], dp[i-1][w])
+            else:
+                dp[i][w] = dp[i-1][w]
+
+    # Reconstruct the solution
+    selected_items = []
+    w = capacity
+    for i in range(n, 0, -1):
+        if dp[i][w] != dp[i-1][w]:
+            selected_items.append(i)
+            w -= weights[i-1]
+
+    return dp[n][capacity], selected_items
+
+weights = [4, 5, 7, 3, 6]
+values = [30, 40, 70, 20, 50]
+capacity = 15
+
+max_value, items = knapsack(weights, values, capacity)
+print("Maximum achievable value:", max_value)
+print("Items to be packed (1-indexed):", items)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [4, 3, 2]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [4, 3, 2]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 4 (3kg, $20), Item 3 (7kg, $70), and Item 2 (5kg, $40).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 4: 3 kg, $20
+- Item 3: 7 kg, $70
+- Item 2: 5 kg, $40
+
+Total weight: 3 + 7 + 5 = 15 kg  
+Total value: 20 + 70 + 40 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The provided solution for the 0/1 Knapsack problem is correct and optimal. The maximum achievable value is indeed $130, and the items selected are Item 4 (3kg, $20), Item 3 (7kg, $70), and Item 2 (5kg, $40). The total weight of these items is exactly 15 kg, which matches the knapsack's capacity.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [4, 3, 2]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 4 (3kg, $20), Item 3 (7kg, $70), and Item 2 (5kg, $40).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 4: 3 kg, $20
+- Item 3: 7 kg, $70
+- Item 2: 5 kg, $40
+
+Total weight: 3 + 7 + 5 = 15 kg  
+Total value: 20 + 70 + 40 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.
+
+If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># Define the items with their weights and values
+items = [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)]
+capacity = 15
+
+# Initialize the DP table
+dp = [[0 for _ in range(capacity + 1)] for _ in range(len(items) + 1)]
+
+# Fill the DP table
+for i in range(1, len(items) + 1):
+    weight, value = items[i-1]
+    for w in range(1, capacity + 1):
+        if weight <= w:
+            dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
+        else:
+            dp[i][w] = dp[i-1][w]
+
+# The maximum achievable value
+max_value = dp[len(items)][capacity]
+print("Maximum achievable value:", max_value)
+
+# Determine which items to pack
+selected_items = []
+w = capacity
+for i in range(len(items), 0, -1):
+    if dp[i][w] != dp[i-1][w]:
+        selected_items.append(i)
+        w -= items[i-1][0]
+
+print("Items to be packed (1-indexed):", selected_items[::-1])
+```
+
+This script implements the 0/1 Knapsack problem using dynamic programming. It calculates the maximum achievable value and lists the items that should be packed. The output is verified to be correct based on the provided data points.
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [2, 3, 4]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 2 (5kg, $40), Item 3 (7kg, $70), and Item 4 (3kg, $20).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 2: 5 kg, $40
+- Item 3: 7 kg, $70
+- Item 4: 3 kg, $20
+
+Total weight: 5 + 7 + 3 = 15 kg  
+Total value: 40 + 70 + 20 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.
+
+If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># Define the items with their weights and values
+items = [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)]
+capacity = 15
+
+# Initialize the DP table
+dp = [[0 for _ in range(capacity + 1)] for _ in range(len(items) + 1)]
+
+# Fill the DP table
+for i in range(1, len(items) + 1):
+    weight, value = items[i-1]
+    for w in range(1, capacity + 1):
+        if weight <= w:
+            dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
+        else:
+            dp[i][w] = dp[i-1][w]
+
+# The maximum achievable value
+max_value = dp[len(items)][capacity]
+print("Maximum achievable value:", max_value)
+
+# Determine which items to pack
+selected_items = []
+w = capacity
+for i in range(len(items), 0, -1):
+    if dp[i][w] != dp[i-1][w]:
+        selected_items.append(i)
+        w -= items[i-1][0]
+
+print("Items to be packed (1-indexed):", selected_items[::-1])
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [2, 3, 4]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 2 (5kg, $40), Item 3 (7kg, $70), and Item 4 (3kg, $20).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 2: 5 kg, $40
+- Item 3: 7 kg, $70
+- Item 4: 3 kg, $20
+
+Total weight: 5 + 7 + 3 = 15 kg  
+Total value: 40 + 70 + 20 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.
+
+If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># Define the items with their weights and values
+items = [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)]
+capacity = 15
+
+# Initialize the DP table
+dp = [[0 for _ in range(capacity + 1)] for _ in range(len(items) + 1)]
+
+# Fill the DP table
+for i in range(1, len(items) + 1):
+    weight, value = items[i-1]
+    for w in range(1, capacity + 1):
+        if weight <= w:
+            dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
+        else:
+            dp[i][w] = dp[i-1][w]
+
+# The maximum achievable value
+max_value = dp[len(items)][capacity]
+print("Maximum achievable value:", max_value)
+
+# Determine which items to pack
+selected_items = []
+w = capacity
+for i in range(len(items), 0, -1):
+    if dp[i][w] != dp[i-1][w]:
+        selected_items.append(i)
+        w -= items[i-1][0]
+
+print("Items to be packed (1-indexed):", selected_items[::-1])
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [2, 3, 4]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 2 (5kg, $40), Item 3 (7kg, $70), and Item 4 (3kg, $20).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 2: 5 kg, $40
+- Item 3: 7 kg, $70
+- Item 4: 3 kg, $20
+
+Total weight: 5 + 7 + 3 = 15 kg  
+Total value: 40 + 70 + 20 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.
+
+If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To verify the solution using the 0/1 Knapsack dynamic programming algorithm, let's break down the steps and ensure the code is correct.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Step-by-Step Verification
+
+1. **Initialization**:
+   - We have 5 items with weights and values: [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)].
+   - The knapsack capacity is 15 kg.
+
+2. **DP Table Initialization**:
+   - Create a DP table `dp` with dimensions `(len(items) + 1) x (capacity + 1)` initialized to 0.
+
+3. **Filling the DP Table**:
+   - Iterate over each item and for each possible weight from 1 to capacity.
+   - If the current item's weight is less than or equal to the current weight `w`, update the DP table by taking the maximum of not including the item (`dp[i-1][w]`) or including the item (`dp[i-1][w-weight] + value`).
+   - If the current item's weight is greater than `w`, just carry forward the previous value (`dp[i-1][w]`).
+
+4. **Extracting the Result**:
+   - The maximum achievable value is found at `dp[len(items)][capacity]`.
+   - To find which items are included, trace back from `dp[len(items)][capacity]` to `dp[0][0]`.
+
+### Code Execution
+
+Let's run the code again to ensure it produces the correct output.
+
+```python
+# Define the items with their weights and values
+items = [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)]
+capacity = 15
+
+# Initialize the DP table
+dp = [[0 for _ in range(capacity + 1)] for _ in range(len(items) + 1)]
+
+# Fill the DP table
+for i in range(1, len(items) + 1):
+    weight, value = items[i-1]
+    for w in range(1, capacity + 1):
+        if weight <= w:
+            dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
+        else:
+            dp[i][w] = dp[i-1][w]
+
+# The maximum achievable value
+max_value = dp[len(items)][capacity]
+print("Maximum achievable value:", max_value)
+
+# Determine which items to pack
+selected_items = []
+w = capacity
+for i in range(len(items), 0, -1):
+    if dp[i][w] != dp[i-1][w]:
+        selected_items.append(i)
+        w -= items[i-1][0]
+
+print("Items to be packed (1-indexed):", selected_items[::-1])
+```
+
+### Expected Output
+
+The expected output should be:
+```
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]
+```
+
+This confirms that the code is correctly implementing the 0/1 Knapsack dynamic programming algorithm and producing the optimal solution.
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is as follows:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Maximum achievable value: 130  
+Items to be packed (1-indexed): [2, 3, 4]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 2 (5kg, $40), Item 3 (7kg, $70), and Item 4 (3kg, $20).
+
+To verify this result, let's manually check the total weight and value:
+
+- Item 2: 5 kg, $40
+- Item 3: 7 kg, $70
+- Item 4: 3 kg, $20
+
+Total weight: 5 + 7 + 3 = 15 kg  
+Total value: 40 + 70 + 20 = $130
+
+The solution is correct and optimal for the given problem. There are no issues with the code regarding technical correctness, edge cases, or safety.
+
+If you need further assistance or have additional questions about the code or the problem, feel free to ask!</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    To verify the solution using the 0/1 Knapsack dynamic programming algorithm, let's break down the steps and ensure the code is correct.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">### Step-by-Step Verification
+
+1. **Initialization**:
+   - We have 5 items with weights and values: [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)].
+   - The knapsack capacity is 15 kg.
+
+2. **DP Table Initialization**:
+   - Create a DP table `dp` with dimensions `(len(items) + 1) x (capacity + 1)` initialized to 0.
+
+3. **Filling the DP Table**:
+   - Iterate over each item and for each possible weight from 1 to capacity.
+   - If the current item's weight is less than or equal to the current weight `w`, update the DP table by taking the maximum of not including the item (`dp[i-1][w]`) or including the item (`dp[i-1][w-weight] + value`).
+   - If the current item's weight is greater than `w`, just carry forward the previous value (`dp[i-1][w]`).
+
+4. **Extracting the Result**:
+   - The maximum achievable value is found at `dp[len(items)][capacity]`.
+   - To find which items are included, trace back from `dp[len(items)][capacity]` to `dp[0][0]`.
+
+### Code Execution
+
+Let's run the code again to ensure it produces the correct output.
+
+```python
+# Define the items with their weights and values
+items = [(4, 30), (5, 40), (7, 70), (3, 20), (6, 50)]
+capacity = 15
+
+# Initialize the DP table
+dp = [[0 for _ in range(capacity + 1)] for _ in range(len(items) + 1)]
+
+# Fill the DP table
+for i in range(1, len(items) + 1):
+    weight, value = items[i-1]
+    for w in range(1, capacity + 1):
+        if weight <= w:
+            dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
+        else:
+            dp[i][w] = dp[i-1][w]
+
+# The maximum achievable value
+max_value = dp[len(items)][capacity]
+print("Maximum achievable value:", max_value)
+
+# Determine which items to pack
+selected_items = []
+w = capacity
+for i in range(len(items), 0, -1):
+    if dp[i][w] != dp[i-1][w]:
+        selected_items.append(i)
+        w -= items[i-1][0]
+
+print("Items to be packed (1-indexed):", selected_items[::-1])
+```
+
+### Expected Output
+
+The expected output should be:
+```
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]
+```
+
+This confirms that the code is correctly implementing the 0/1 Knapsack dynamic programming algorithm and producing the optimal solution.
+[SYSTEM: Wynik wykonania kodu Python]:
+Maximum achievable value: 130
+Items to be packed (1-indexed): [2, 3, 4]</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 mb-2">
+                    Based on the solution accepted by the Critic, here is a final, readable, and concise answer for the end user:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Maximum Achievable Value:** $130
+**Items to be packed (1-indexed):** [2, 3, 4]
+
+This result indicates that the maximum value that can be achieved with a knapsack capacity of 15 kg is $130. The items selected are Item 2 (5kg, $40), Item 3 (7kg, $70), and Item 4 (3kg, $20).</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

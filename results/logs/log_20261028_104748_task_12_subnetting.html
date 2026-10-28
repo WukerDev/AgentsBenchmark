@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie task_12_subnetting - Log Badania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:underline text-sm font-medium">&larr; Powrót do pulpitu wyników</a>
+            <h1 class="text-3xl font-bold mt-2 text-gray-900">task_12_subnetting</h1>
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Treść zadania</div>
+                <div class="text-base text-blue-950 font-medium mt-1">You are a network administrator. You received the IP address 172.16.55.87 with a /27 mask. Calculate the Network Address, Broadcast Address, and the exact number of available host addresses. Do not guess, write code to calculate this.</div>
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <span class="text-xs font-semibold text-blue-700 uppercase">Wzorzec (Ground Truth):</span>
+                    <span class="text-sm text-blue-900 ml-1">Network: 172.16.55.64. Broadcast: 172.16.55.95. Number of hosts: 30. (A great test for bitwise operations. Solo LLMs often confuse ranges in unusual masks like /27).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Solo ReAct Score</div>
+                <div class="text-2xl font-bold text-gray-800 mt-1">83.3 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 30.17s | Koszt: $0.0041</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 5</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">58.3 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Tura 10</div>
+                <div class="text-2xl font-bold text-indigo-600 mt-1">100.0 / 100</div>
+            </div>
+            <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="text-xs text-gray-500 font-medium">Multi-Agent Finał</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">100.0 / 100</div>
+                <div class="text-xs text-gray-400 mt-1">Czas: 374.27s | Koszt: $0.0581</div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 mb-8">
+            <div class="text-xs font-semibold text-yellow-800 uppercase tracking-wider">Uzasadnienie Jury Sędziowskiego</div>
+            <div class="text-sm text-yellow-950 mt-1">[phi4:latest]: Odpowiedź Solo (A) dostarcza poprawne wyniki, ale brakuje pełnego uzasadnienia i dowodu. Odpowiedź Multi-Agent Tura 5 zawiera błąd wykonania z powodu pominiętego importu, co skutkuje zerową oceną. Odpowiedzi Multi-Agent Tura 10 i Finał są poprawne, kompleksowe i dobrze uzasadnione, spełniając kryteria WZORCA. | [qwen2.5:14b]: Odpowiedź Solo jest poprawna i zgodna z WZORCEM, choć nie pokazano kodu. Multi-Agent w trzeciej turze poprawnie wykonał obliczenia i naprawił błąd importu biblioteki ipaddress. | [mistral-nemo:12b]: Odpowiedź Solo Model - ReAct jest częściowo poprawna, ale uzasadnienie mało precyzyjne. Odpowiedzi Multi-Agent są poprawne i zgodne z WZORCEM.</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                    Solo Agent (ReAct)
+                </h2>
+                <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-200 font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800 max-h-[800px] overflow-y-auto">
+                    ZADANIE: You are a network administrator. You received the IP address 172.16.55.87 with a /27 mask. Calculate the Network Address, Broadcast Address, and the exact number of available host addresses. Do not guess, write code to calculate this.
+
+--- Tura 1 (Solo ReAct) ---
+Aby obliczyć Network Address, Broadcast Address oraz liczbę dostępnych adresów hosta dla podanego zakresu IP (172.16.55.87 z maską /27), możemy użyć następującego kodu Python:
+
+```python
+import ipaddress
+
+# Define the given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Get Network Address, Broadcast Address and number of available host addresses
+print(f"Network Address: {network.network_address}")
+print(f"Broadcast Address: {network.broadcast_address}")
+print(f"Number of Available Host Addresses: {network.num_addresses - 2}") # Subtracting 2 for network and broadcast address
+```
+
+Uruchomię teraz ten kod.
+```python
+import ipaddress
+
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+print(f"Network Address: {network.network_address}")
+print(f"Broadcast Address: {network.broadcast_address}")
+print(f"Number of Available Host Addresses: {network.num_addresses - 2}") # Subtracting 2 for network and broadcast address
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Number of Available Host Addresses: 30
+
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Number of Available Host Addresses: 30
+
+
+--- Tura 2 (Solo ReAct) ---
+ZATWIERDZAM WYNIK
+
+Na podstawie obliczeń wykonywanych przez kod Python:
+
+- Network Address dla zakresu IP 172.16.55.87 z maską /27 wynosi: **172.16.55.64**
+- Broadcast Address dla tego zakresu wynosi: **172.16.55.95**
+- Liczba dostępnych adresów hosta wynosi: **30**
+
+To jest pełny i dokładny opis dla podanego zadania.
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Multi-Agent Swarm
+                </h2>
+                <div class="max-h-[800px] overflow-y-auto pr-2">
+                    
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is correct. Here's a breakdown of the results:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">- **Network Address**: 172.16.55.64
+- **Broadcast Address**: 172.16.55.95
+- **Available Host Addresses**: 30
+
+The calculations are accurate for an IP address with a /27 subnet mask. The network address is correctly calculated as the first address in the range, and the broadcast address is correctly calculated as the last address in the range. The number of available host addresses (30) is also correct, as it accounts for the subtraction of 2 addresses (the network address and the broadcast address) from the total number of addresses in the subnet (32).
+
+No further action is needed regarding technical correctness, edge cases, or safety of the script.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and the technical output is correct. Here's a breakdown of the results:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">- **Network Address**: 172.16.55.64
+- **Broadcast Address**: 172.16.55.95
+- **Available Host Addresses**: 30
+
+The calculations are accurate for an IP address with a /27 subnet mask. The network address is correctly calculated as the first address in the range, and the broadcast address is correctly calculated as the last address in the range. The number of available host addresses (30) is also correct, as it accounts for the subtraction of 2 addresses (the network address and the broadcast address) from the total number of addresses in the subnet (32).
+
+No further action is needed regarding technical correctness, edge cases, or safety of the script.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30
+[SYSTEM: Wynik wykonania kodu Python]:
+BŁĄD WYKONANIA (exit code 1):
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+NameError: name 'ipaddress' is not defined. Did you forget to import 'ipaddress'?</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The error message indicates that the `ipaddress` module is not imported. To fix this, you need to add an import statement at the beginning of your code.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Here's the corrected code:
+
+```python
+import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+
+This should resolve the `NameError` and allow the code to execute correctly.
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and produced the following output:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Network Address: 172.16.55.64  
+Broadcast Address: 172.16.55.95  
+Available Host Addresses: 30
+
+Let's verify the calculations:
+
+1. **Network Address**: The network address is calculated by performing a bitwise AND operation between the IP address and the subnet mask. For the given IP address `172.16.55.87` (which is `10101100.00010000.00110111.01010111` in binary) and the subnet mask `/27` (which is `255.255.255.224` or `11111111.11111111.11111111.11100000` in binary), the result is `172.16.55.64`. This calculation is correct.
+
+2. **Broadcast Address**: The broadcast address is calculated by setting all host bits to 1. For a `/27` subnet mask, the first 27 bits are network bits and the last 5 bits are host bits. Setting all host bits to 1 gives `172.16.55.95`. This calculation is also correct.
+
+3. **Available Host Addresses**: The number of available host addresses in a `/27` subnet is calculated by subtracting 2 from the total number of addresses (which is `2^5 = 32`). Therefore, `32 - 2 = 30` available host addresses. This calculation is correct.
+
+The output matches the expected results for the given IP address and subnet mask. The code is technically correct and handles the calculations accurately.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+print(f"Network Address: {network_address}")
+print(f"Broadcast Address: {broadcast_address}")
+print(f"Available Host Addresses: {available_hosts}")
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The code executed without errors and produced the following output:
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Network Address: 172.16.55.64  
+Broadcast Address: 172.16.55.95  
+Available Host Addresses: 30
+
+Let's verify the calculations:
+
+1. **Network Address**: The network address is calculated by performing a bitwise AND operation between the IP address and the subnet mask. For the given IP address `172.16.55.87` (which is `10101100.00010000.00110111.01010111` in binary) and the subnet mask `/27` (which is `255.255.255.224` or `11111111.11111111.11111111.11100000` in binary), the result is `172.16.55.64`. This calculation is correct.
+
+2. **Broadcast Address**: The broadcast address is calculated by setting all host bits to 1. For a `/27` subnet mask, the first 27 bits are network bits and the last 5 bits are host bits. Setting all host bits to 1 gives `172.16.55.95`. This calculation is also correct.
+
+3. **Available Host Addresses**: The number of available host addresses in a `/27` subnet is calculated by subtracting 2 from the total number of addresses (which is `2^5 = 32`). Therefore, `32 - 2 = 30` available host addresses. This calculation is correct.
+
+The output matches the expected results for the given IP address and subnet mask. The code is technically correct and handles the calculations accurately.</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"># your code here
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+BŁĄD WYKONANIA (exit code 1):
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+NameError: name 'result' is not defined</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    QA Engineer / Debugger (qa_engineer)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    The error message indicates that the variable `result` is not defined in your code. This is likely because you have not assigned any value to `result`. To fix this issue, you need to assign the output of your calculations to the `result` variable before printing it.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">Here's how you can modify your code:
+
+```python
+import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+# Assign the results to a variable
+result = f"Network Address: {network_address}\nBroadcast Address: {broadcast_address}\nAvailable Host Addresses: {available_hosts}"
+
+print(result)
+```
+
+This code will correctly calculate the network address, broadcast address, and available host addresses, assign them to the `result` variable, and then print the result.
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 mb-2">
+                    Python Developer (coder)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
+                    ```python
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">import ipaddress
+
+# Given IP address and subnet mask
+ip = "172.16.55.87"
+subnet_mask = "/27"
+
+# Create an IPv4 network object
+network = ipaddress.IPv4Network(ip + subnet_mask, strict=False)
+
+# Calculate the Network Address
+network_address = network.network_address
+
+# Calculate the Broadcast Address
+broadcast_address = network.broadcast_address
+
+# Calculate the number of available host addresses
+available_hosts = network.num_addresses - 2  # Subtracting 2 for the network and broadcast addresses
+
+# Assign the results to a variable
+result = f"Network Address: {network_address}\nBroadcast Address: {broadcast_address}\nAvailable Host Addresses: {available_hosts}"
+
+print(result)
+```
+[SYSTEM: Wynik wykonania kodu Python]:
+Network Address: 172.16.55.64
+Broadcast Address: 172.16.55.95
+Available Host Addresses: 30</div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
+                    Secretary (secretary)
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap"></div>
+            </div>
+            
+            <div class="mb-4 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 mb-2">
+                    Based on the solution accepted by the Critic, I will draft a final, readable, and concise answer for the end user.
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed font-mono whitespace-pre-wrap">**Network Address:** 172.16.55.64
+**Broadcast Address:** 172.16.55.95
+**Available Host Addresses:** 30</div>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

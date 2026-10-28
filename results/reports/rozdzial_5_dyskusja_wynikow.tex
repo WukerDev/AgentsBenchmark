@@ -1,0 +1,39 @@
+\section{Wyniki Badań i Dyskusja}
+\label{sec:wyniki_dyskusja}
+
+\subsection{Metodologia Pomiarowa i Przebieg Eksperymentu}
+W ramach części doświadczalnej niniejszej pracy poddano szczegółowej analizie porównawczej dwa przeciwstawne modele rozwiązywania problemów za pomocą wielkich modeli językowych:
+architekturę jednoagentową \textbf{Solo ReAct} oraz wieloagentowy rój dyskusyjny \textbf{Multi-Agent Swarm (Group Chat)}.
+Eksperyment przeprowadzono na reprezentatywnym zbiorze $N = 35$ zadań testowych obejmujących m.in. programowanie, analizę logów, dedukcję logiczno-matematyczną oraz odzyskiwanie poufnych danych z bazy wiedzy.
+
+\subsection{Analiza Skuteczności i Testy Hipotez}
+Średni wynik uzyskany przez zespół wieloagentowy wyniósł $82.96 \pm 26.44$~pkt, podczas gdy pojedynczy agent ReAct osiągnął średnio $67.66 \pm 24.14$~pkt,
+co daje statystyczny przyrost jakości o $+15.30$~pkt. Architektura wieloagentowa odniosła zwycięstwo w $27$ spośród $35$ zadań (wskaźnik wygranych: $77.1\%$),
+podczas gdy w $1$ przypadkach obie konfiguracje uzyskały identyczny rezultat.
+
+W celu formalnej weryfikacji hipotezy badawczej zastosowano test rangowy Wilcoxona dla prób zależnych:
+uzyskano statystykę $W = 146.5$ przy poziomie istotności $p = 0.00969$. Wielkość efektu mierzona standaryzowaną miarą $d$~Cohena wyniosła $d = 0.397$,
+co potwierdza merytoryczną i statystyczną istotność przewagi roju agentów (Tabela~\ref{tab:statystyki}).
+
+\subsection{Rzetelność Oceny i Zgodność Panelu Sędziowskiego}
+Aby wyeliminować błędy subiektywności ewaluacji, ocenę przeprowadzono w procedurze panelu sędziowskiego \textit{LLM-as-a-Jury}.
+Zgodność pomiędzy niezależnymi ewaluatorami zweryfikowano testem rangowym Kendalla, uzyskując współczynnik zgodności $W = 0.749$ ($p = 4e-05$).
+Wartość ta dowodzi wysokiej spójności orzekania i wyklucza przypadkowość werdyktów.
+
+\subsection{Dynamika Dyskusji i Mechanizm Samo-Korekty}
+Doświadczenie wykazało, że kluczową zaletą architektury wieloagentowej jest zdolność do eliminacji halucynacji w trakcie debaty (Rysunek~\ref{fig:ewolucja}).
+Zarejestrowane punkty kontrolne wykazały progres z poziomu $73.33$~pkt w 5.~turze do $82.96$~pkt w podsumowaniu sekretarza,
+co daje średni zysk z debaty na poziomie $+9.62$~pkt (Tabela~\ref{tab:ewolucja}).
+
+Wskaźnik samo-korekty (\textit{Self-Correction Rate}) wyniósł $36.4\%$, co oznacza, że w znakomitej większości przypadków błędna wstępna koncepcja agenta rozwiązującego
+została skutecznie zakwestionowana i skorygowana przez audytorów. Wskaźnik degradacji (\textit{Derailment Rate}) utrzymał się na niskim poziomie $5.3\%$.
+
+\subsection{Przedziały Ufności 95\% CI}
+Wyznaczone przedziały ufności dla średnich wyników punktowych:
+Solo ReAct: $[59.25, 76.07]$~pkt; Multi-Agent Swarm: $[73.74, 92.17]$~pkt.
+
+\subsection{Efektywność Obliczeniowa i Kosztowa}
+Wzrost jakości odpowiedzi w roju wiąże się z większym narzutem zasobów:
+średnie zużycie tokenów wyniosło odpowiednio $21630$ dla Multi-Agent vs $1424$ dla Solo ($15.2\times$),
+co przełożyło się na koszty rzędu \$0.0547$ vs \$0.0036$.
+Z punktu widzenia inżynierii oprogramowania uzasadnione jest stosowanie architektury adaptacyjnej, uruchamiającej rój agentów wyłącznie dla zadań oznaczonych wysokim poziomem krytyczności.
