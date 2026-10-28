@@ -130,11 +130,12 @@
               <v-col cols="12" sm="6" md="3">
                 <v-card border elevation="0" class="pa-4 rounded-lg">
                   <div class="text-caption text-medium-emphasis">Istotność Statystyczna (Wilcoxon)</div>
-                  <div class="text-h5 font-weight-bold mt-1 text-accent">
-                    p = {{ stats.wilcoxon_pvalue != null ? stats.wilcoxon_pvalue : 'N/A' }}
+                  <div class="text-h5 font-weight-bold mt-1 text-accent d-flex align-center">
+                    p {{ stats.wilcoxon_pvalue != null ? (stats.wilcoxon_pvalue < 0.001 ? '< 0.001' : '= ' + stats.wilcoxon_pvalue) : 'N/A' }}
+                    <v-chip v-if="stats.wilcoxon_pvalue != null && stats.wilcoxon_pvalue < 0.05" size="x-small" color="success" class="ml-2 font-weight-bold">p &lt; 0.05</v-chip>
                   </div>
                   <div class="text-caption text-medium-emphasis mt-1">
-                    Wielkość efektu: d = {{ stats.cohens_d != null ? stats.cohens_d : 'N/A' }}
+                    Wielkość efektu: d = {{ stats.cohens_d != null ? stats.cohens_d : 'N/A' }} {{ (stats.cohens_d || 0) >= 0.8 ? '(duży efekt)' : '' }}
                   </div>
                 </v-card>
               </v-col>

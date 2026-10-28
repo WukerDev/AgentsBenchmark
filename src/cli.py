@@ -137,3 +137,8 @@ def draft_chapter():
     md_path, tex_path = ThesisChapterGenerator.generate(reports_dir, df, stats)
     console.print(f"[bold green][OK] Wygenerowano szkic rozdziału Markdown:[/bold green] {md_path}")
     console.print(f"[bold green][OK] Wygenerowano szkic rozdziału LaTeX:[/bold green] {tex_path}")
+
+
+if __name__ == "__main__":
+    app()
+

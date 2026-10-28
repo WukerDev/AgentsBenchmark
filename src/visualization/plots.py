@@ -173,13 +173,25 @@ class BenchmarkVisualizer:
     def plot_pareto_cost_score(cls, df: pd.DataFrame, save_path: Path):
         fig, ax = plt.subplots(figsize=(8, 6))
 
-        ax.scatter(df["solo_cost_usd"], df["score_solo"], color="#718096", alpha=0.7, s=60, label="Solo ReAct")
-        ax.scatter(df["multi_cost_usd"], df["score_multi_final"], color="#38A169", alpha=0.7, s=60, label="Multi-Agent")
+        if not df.empty and "solo_cost_usd" in df and "multi_cost_usd" in df:
+            ax.scatter(df["solo_cost_usd"], df["score_solo"], color="#718096", alpha=0.7, s=65, label="Solo ReAct (Zadania)", edgecolors="black", linewidths=0.5)
+            ax.scatter(df["multi_cost_usd"], df["score_multi_final"], color="#38A169", alpha=0.75, s=75, label="Multi-Agent Swarm (Zadania)", edgecolors="black", linewidths=0.5)
 
-        ax.set_title("Analiza Koszt-Efekt: Wynik vs Koszt (USD)")
-        ax.set_xlabel("Koszt Wykonania Zadania (USD)")
-        ax.set_ylabel("Wynik Punktowy (0-100)")
-        ax.legend()
+            solo_c_mean = float(df["solo_cost_usd"].mean())
+            solo_s_mean = float(df["score_solo"].mean())
+            multi_c_mean = float(df["multi_cost_usd"].mean())
+            multi_s_mean = float(df["score_multi_final"].mean())
+
+            ax.scatter(solo_c_mean, solo_s_mean, color="#2D3748", marker="D", s=130, label=f"Średnia Solo (${solo_c_mean:.4f}, {solo_s_mean:.1f} pkt)", edgecolors="white", linewidths=1.5, zorder=5)
+            ax.scatter(multi_c_mean, multi_s_mean, color="#22543D", marker="D", s=130, label=f"Średnia Swarm (${multi_c_mean:.4f}, {multi_s_mean:.1f} pkt)", edgecolors="white", linewidths=1.5, zorder=5)
+
+        ax.set_title("Analiza Koszt-Efekt: Jakość Rozwiązania vs Koszt Tokenów (USD)", fontsize=12, fontweight="bold")
+        ax.set_xlabel("Szacowany Koszt Zadania (USD)", fontsize=10)
+        ax.set_ylabel("Wynik Punktowy (0-100)", fontsize=10)
+        ax.set_ylim(0, 105)
+        ax.set_xlim(left=0)
+        ax.grid(True, linestyle="--", alpha=0.45)
+        ax.legend(loc="lower right", framealpha=0.9)
 
         plt.tight_layout()
         fig.savefig(save_path, dpi=300)
