@@ -17,6 +17,9 @@ from src.evaluation.statistics import compute_benchmark_statistics
 from src.storage.checkpoint import CheckpointManager
 from src.storage.excel_exporter import ExcelBenchmarkExporter
 from src.storage.latex_exporter import LatexExporter
+from src.storage.thesis_chapter_generator import ThesisChapterGenerator
+from src.evaluation.failure_taxonomy import FailureTaxonomy
+from src.hardware.telemetry import HardwareProfiler
 from src.storage.html_reporter import HTMLReporter
 from src.visualization.plots import BenchmarkVisualizer
 from src.ui.console import BenchmarkLiveConsole, console
@@ -197,7 +200,10 @@ class BenchmarkRunner:
                     "multi_tool_errors": group_res.get("tool_error_count", 0),
                     "jury_std_dev": scores.get("jury_std_dev", 0.0),
                     "agent_path": group_res.get("agent_path", ""),
-                    "jury_reason": scores.get("jury_reasons", "")
+                    "jury_reason": scores.get("jury_reasons", ""),
+                    "failure_taxonomy": FailureTaxonomy.classify_record({"score_multi_final": scores.get("score_multi_final", 0.0), "gt_multi_score": gt_multi_score, "multi_turns": group_res.get("turns", 0), "multi_tool_errors": group_res.get("tool_error_count", 0), "hallucination_multi": scores.get("hallucination_multi", False), "agent_path": group_res.get("agent_path", "")}),
+                    "gpu_vram_mb": HardwareProfiler.get_gpu_status().get("used_vram_mb", 0),
+                    "gpu_util_pct": HardwareProfiler.get_gpu_status().get("utilization_pct", 0)
                 }
 
                 self.checkpoint_mgr.save_task_result(row_record)
@@ -234,6 +240,9 @@ class BenchmarkRunner:
 
         LatexExporter.export(self.reports_dir, df_final, stats)
         console.print(f"[bold green][OK] Wygenerowano tabele LaTeX w:[/bold green] [underline]{self.reports_dir}[/underline]")
+
+        ThesisChapterGenerator.generate(self.reports_dir, df_final, stats)
+        console.print(f"[bold green][OK] Wygenerowano szkic rozdziału magisterskiego w:[/bold green] [underline]{self.reports_dir}[/underline]")
 
         BenchmarkVisualizer.generate_all_plots(df_final, self.figures_dir, show=False)
         console.print(f"[bold green][OK] Wygenerowano wykresy badawcze w:[/bold green] [underline]{self.figures_dir}[/underline]")
